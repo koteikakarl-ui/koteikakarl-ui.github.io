@@ -35,8 +35,11 @@
   const layout=()=>{
    if(card)return;
    const s=getComputedStyle(video);
-   Object.assign(canvas.style,{position:'absolute',pointerEvents:'none',left:video.offsetLeft+'px',top:video.offsetTop+'px',width:video.offsetWidth+'px',height:video.offsetHeight+'px',transform:s.transform,transformOrigin:s.transformOrigin,opacity:s.opacity,objectFit:s.objectFit,objectPosition:s.objectPosition,zIndex:s.zIndex,mixBlendMode:'normal',visibility:'visible'});
+   const motion=video.classList.contains('case-motion__video');
+   const active=!motion||video.classList.contains('is-active');
+   Object.assign(canvas.style,{position:'absolute',pointerEvents:'none',left:video.offsetLeft+'px',top:video.offsetTop+'px',width:video.offsetWidth+'px',height:video.offsetHeight+'px',transform:s.transform,transformOrigin:s.transformOrigin,opacity:motion?(active?'1':'0'):s.opacity,objectFit:s.objectFit,objectPosition:s.objectPosition,zIndex:s.zIndex,mixBlendMode:'normal',visibility:active?'visible':'hidden'});
   };
+  layout();
   let lastTime=-1;
   const draw=()=>{
    if(video.readyState<2||!video.videoWidth||gl.isContextLost())return canvas;

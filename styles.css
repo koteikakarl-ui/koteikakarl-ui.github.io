@@ -600,8 +600,10 @@ body.case-study-open{overflow:hidden}
 .process-chip--motion{left:58.2%;top:63.91%;background:linear-gradient(90deg,#f2b8b0,#ffe0cc)}
 .case-process__production{position:absolute;z-index:2;left:101.95%;top:52.66%;color:rgba(219,64,11,.72);font-size:10px;font-weight:500;white-space:nowrap}
 .case-motion{position:relative;width:100%;aspect-ratio:976/610;margin-top:64px;overflow:hidden;border-radius:28px;background:linear-gradient(135deg,#fff0dc,#ffb06b)}
-.case-motion__video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transform:scale(1.02);transition:opacity .55s ease,transform .8s cubic-bezier(.22,1,.36,1);mix-blend-mode:multiply}
-.case-motion__video.is-active{opacity:1;transform:scale(1)}
+.case-motion__video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;visibility:hidden;transform:scale(1.02);transition:transform .8s cubic-bezier(.22,1,.36,1);mix-blend-mode:multiply}
+.case-motion__video.is-active{opacity:1;visibility:visible;transform:scale(1)}
+/* Transparent slides must switch exclusively, including the Safari canvas. */
+.case-motion__video:not(.is-active) + .safari-video-surface{visibility:hidden!important;opacity:0!important}
 .case-motion__controls{position:absolute;z-index:3;right:30px;top:28px;display:flex;gap:8px}
 .case-motion__controls button{width:46px;height:44px;padding:0;border:1px solid rgba(235,89,26,.28);border-radius:22px;background:rgba(255,255,255,.86);color:#db400b;font-family:inherit;font-size:12px;font-weight:600;line-height:1;cursor:pointer;transition:background .25s,color .25s,transform .25s}
 .case-motion__controls button:hover{transform:translateY(-2px)}
