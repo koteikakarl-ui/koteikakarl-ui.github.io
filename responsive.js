@@ -11,7 +11,9 @@
   const b=el('button','compact-about__tab',label);b.type='button';b.id='about-tab-'+i;b.setAttribute('role','tab');b.setAttribute('aria-controls','about-panel-'+i);nav.append(b);
   const p=el('article','compact-about__panel');p.id='about-panel-'+i;p.setAttribute('role','tabpanel');p.setAttribute('aria-labelledby',b.id);stage.append(p);return p;
  });
- compact.append(nav,stage);resume.before(compact);
+ const navShell=el('div','compact-about__nav-shell'),sentinel=el('span','compact-about__nav-sentinel');
+ navShell.append(nav);compact.append(sentinel,navShell,stage);resume.before(compact);
+ new IntersectionObserver(([entry])=>navShell.classList.toggle('is-stuck',!entry.isIntersecting&&entry.boundingClientRect.top<0),{threshold:0}).observe(sentinel);
  const intro=el('div','compact-about__intro'),portrait=el('img','compact-about__portrait');
  portrait.src='assets/about-portrait-figma.webp';portrait.alt='Иллюстрация Даши';portrait.loading='lazy';
  const copy=el('div','compact-about__copy');copy.append(el('p','eyebrow',text('.resume-kicker')),el('h2','','Коммуникационный дизайнер'),el('p','',text('.resume-body')));
@@ -113,7 +115,10 @@
  const dots=el('div','compact-about__dots');dots.setAttribute('aria-label','Отзывы');
  const showReview=i=>{reviewIndex=(i+quotes.children.length)%quotes.children.length;[...quotes.children].forEach((q,j)=>q.hidden=j!==reviewIndex);[...dots.children].forEach((b,j)=>b.setAttribute('aria-current',String(j===reviewIndex)))};
  [...quotes.children].forEach((q,i)=>{const b=el('button');b.type='button';b.setAttribute('aria-label','Показать отзыв '+(i+1));b.addEventListener('click',()=>showReview(i));dots.append(b)});
- reviews.append(dots);showReview(0);swipe(reviews,d=>showReview(reviewIndex+d));// Drag the icon belt directly; preserve vertical page scrolling.
+ reviews.append(dots);showReview(0);let reviewY=null;
+ reviews.addEventListener('touchstart',e=>{reviewY=e.touches[0].clientY},{passive:true});
+ reviews.addEventListener('touchend',e=>{if(reviewY!==null){const dy=e.changedTouches[0].clientY-reviewY;if(Math.abs(dy)>42)showReview(reviewIndex+(dy<0?1:-1));reviewY=null}},{passive:true});
+ dots.addEventListener('keydown',e=>{if(!['ArrowUp','ArrowDown'].includes(e.key))return;e.preventDefault();showReview(reviewIndex+(e.key==='ArrowDown'?1:-1));dots.children[reviewIndex].focus()});// Drag the icon belt directly; preserve vertical page scrolling.
  let drag=null,suppressClick=false;
  icons.addEventListener('pointerdown',e=>{if(e.button!==0)return;clearTimeout(settleTimer);rebaseBelt();drag={id:e.pointerId,x:e.clientX,y:e.clientY,dx:0,horizontal:false};});
  icons.addEventListener('pointermove',e=>{if(!drag)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(!drag.horizontal&&Math.abs(dx)>8&&Math.abs(dx)>Math.abs(dy)){drag.horizontal=true;icons.setPointerCapture(e.pointerId)}if(!drag.horizontal)return;drag.dx=dx;belt.style.transition='none';belt.style.transform='translateX('+(-physical*76+dx)+'px)';

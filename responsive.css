@@ -619,3 +619,37 @@ body>.hero__gradient-canvas{
 .case-study .case-study__section,.case-study .case-study__rail,.case-study>.case-study__close--floating,.case-study .special-direction,.case-study .case-outcome{border:0}
 .case-study .case-next::before{content:none}
 .case-study .case-context{border:0;border-top:1px solid #ece8e2;padding-top:24px}
+/* Header, review controls and keyboard focus — September 2026. */
+.nav__meta{margin:0;color:rgba(0,0,0,.6);font-size:13px;line-height:1.4}
+@media(min-width:1101px){
+ .hero__parallax-layer>.hero__meta{display:none}
+ .review-slider{height:auto;bottom:24px;overflow:visible;touch-action:pan-x}
+ .review-track{display:grid;height:auto;padding-right:36px}
+ .review-track blockquote{position:relative;inset:auto;grid-area:1/1;height:auto;padding-right:0;transform:translateY(12px);visibility:hidden}
+ .review-track blockquote.is-active{visibility:visible;transform:translateY(0)}
+ .review-track blockquote.is-leaving{visibility:visible;transform:translateY(-12px)}
+ .review-track cite{position:static;height:auto;margin-top:16px;transform:none;text-align:right}
+ .review-dots{top:50%!important;right:0;left:auto;bottom:auto;height:auto;transform:translateY(-50%);flex-direction:column!important;align-items:center;gap:12px}
+ .review-dots button[aria-current=true]{width:8px;height:18px}
+}
+@media(max-width:1100px){
+ .nav__meta{display:none}
+ .hero .nav{justify-content:flex-end}
+ .compact-about__nav-shell{position:sticky;top:0;z-index:5;margin:0 calc(-1 * var(--gutter)) 20px;width:calc(100% + 2 * var(--gutter));isolation:isolate}
+ .compact-about__nav-shell:before{content:'';position:absolute;inset:0 0 -28px;z-index:-1;pointer-events:none;background:linear-gradient(to bottom,rgba(255,255,255,.97) 0,rgba(255,255,255,.97) calc(100% - 28px),transparent);opacity:0;transition:opacity .25s ease}
+ .compact-about__nav-shell.is-stuck:before{opacity:1}
+ .compact-about__nav-shell .compact-about__nav{position:relative;top:auto;width:100%;margin:0;background:none}
+ .compact-about__nav-sentinel{display:block;height:1px;margin-bottom:-1px;pointer-events:none}
+ .compact-about__reviews{display:grid;grid-template-columns:minmax(0,1fr) 28px;gap:12px;align-items:center;margin-top:28px;padding-bottom:0;touch-action:pan-x}
+ .compact-about__dots{flex-direction:column;align-items:center;justify-self:end;gap:0;margin:0}
+ .compact-about__dots button{width:28px;height:36px}
+ .compact-about__dots button:after{transition:height .3s,background .3s}
+ .compact-about__dots button[aria-current=true]:after{width:7px;height:20px}
+ .compact-about__quotes blockquote:not([hidden]){animation:review-vertical .35s ease}
+}
+@keyframes review-vertical{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+/* Mouse/touch focus must not leave a ring after a click or case transition. */
+html body :is(button,a,input,summary):focus:not(:focus-visible){outline:none!important}
+html body :is(button,a,input,summary):focus-visible{outline:2px dotted rgba(0,0,0,.55)!important;outline-offset:4px}
+html body [data-before-after]:focus-within{outline:none!important}
+@media(prefers-reduced-motion:reduce){.compact-about__nav-shell:before,.compact-about__quotes blockquote:not([hidden]){animation:none;transition:none}}
