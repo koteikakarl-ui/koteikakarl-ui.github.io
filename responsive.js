@@ -15,7 +15,7 @@
  navShell.append(nav);compact.append(sentinel,navShell,stage);resume.before(compact);
  new IntersectionObserver(([entry])=>navShell.classList.toggle('is-stuck',!entry.isIntersecting&&entry.boundingClientRect.top<0),{threshold:0}).observe(sentinel);
  const intro=el('div','compact-about__intro'),portrait=el('img','compact-about__portrait');
- portrait.src='assets/about-portrait-figma.webp';portrait.alt='Иллюстрация Даши';portrait.loading='lazy';
+ portrait.src='assets/about-portrait-003.png';portrait.alt='Портрет Даши';portrait.loading='lazy';
  const copy=el('div','compact-about__copy');copy.append(el('p','eyebrow',text('.resume-kicker')),el('h2','','Коммуникационный дизайнер'),el('p','',text('.resume-body')));
  const principle=el('div','compact-about__principle');principle.append(el('p','eyebrow','МОЙ ПОДХОД'),el('h3','',text('.resume-principle__copy')));
  const portraitFrame=el('div','compact-about__portrait-frame');portraitFrame.append(portrait);copy.append(principle);intro.append(portraitFrame,copy);panels[0].append(intro);
@@ -155,27 +155,84 @@
 (()=>{
  const section=document.querySelector('#about-mobile'),nav=section?.querySelector('.compact-about__nav');
  if(!nav)return;
- let timer,touching=false,settling=false;
- const settle=()=>{
-  if(touching||settling||!matchMedia('(max-width:1100px)').matches||document.body.classList.contains('case-study-open'))return;
-  const target=section.getBoundingClientRect().top+scrollY+parseFloat(getComputedStyle(section).paddingTop);
-  const distance=target-scrollY;
-  if(Math.abs(distance)>96||Math.abs(distance)<2)return;
-  settling=true;scrollTo({top:target,behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'instant':'smooth'});
-  setTimeout(()=>settling=false,700);
+ let timer,frame,touching=false,settling=false,lastY=scrollY,direction=0,gestureStart=scrollY,lastInput=0;
+ const cancel=()=>{clearTimeout(timer);cancelAnimationFrame(frame);settling=false;direction=0;lastY=scrollY};
+ const animateTo=target=>{
+  const start=scrollY,distance=target-start;
+  settling=true;
+  if(matchMedia('(prefers-reduced-motion:reduce)').matches){scrollTo({top:target,behavior:'instant'});settling=false;lastY=scrollY;direction=0;return}
+  const duration=Math.min(1250,850+Math.abs(distance)*.35),started=performance.now();
+  const tick=now=>{
+   const t=Math.min(1,(now-started)/duration);
+   // Quintic easing starts and finishes with zero velocity and acceleration.
+   const eased=t*t*t*(t*(t*6-15)+10);
+   scrollTo({top:start+distance*eased,behavior:'instant'});
+   lastY=scrollY;
+   if(t<1)frame=requestAnimationFrame(tick);
+   else{settling=false;direction=0;clearTimeout(timer)}
+  };
+  frame=requestAnimationFrame(tick);
  };
- addEventListener('touchstart',()=>{touching=true;clearTimeout(timer)},{passive:true});
- addEventListener('touchend',()=>{touching=false;clearTimeout(timer);timer=setTimeout(settle,180)},{passive:true});
- addEventListener('scroll',()=>{clearTimeout(timer);if(!settling)timer=setTimeout(settle,180)},{passive:true});
+ const settle=()=>{
+  if(touching||settling||document.body.classList.contains('case-study-open'))return;
+  const work=document.querySelector('#work');
+  if(work){
+   const heading=work.querySelector('.cases__heading');
+   const style=heading&&getComputedStyle(heading);
+   const labelTop=heading?heading.getBoundingClientRect().bottom-parseFloat(style.paddingBottom)-parseFloat(style.lineHeight):work.getBoundingClientRect().top;
+   const anchors=[Math.max(0,labelTop+scrollY-32)];
+   const range=Math.min(innerHeight*.28,240);
+   const candidates=anchors.filter(y=>{const d=y-scrollY;return direction>0?d>=-40&&d<=range:d<=40&&d>=-range});
+   const nearest=candidates.sort((a,b)=>Math.abs(a-scrollY)-Math.abs(b-scrollY))[0];
+   if(nearest!==undefined&&Math.abs(nearest-scrollY)>2){animateTo(nearest);return}
+  }
+  const compact=matchMedia('(max-width:1100px)').matches;
+  const about=compact?section:document.querySelector('#resume');
+  const target=about.getBoundingClientRect().top+scrollY+(compact?parseFloat(getComputedStyle(section).paddingTop):0);
+  const distance=target-scrollY;
+  // The same transition zone leads to About going down and to the hero going up.
+  const approachRange=Math.min(innerHeight*.7,640);
+  if(direction>0&&distance<=approachRange&&distance>=-64&&Math.abs(distance)>=2)animateTo(target);
+  else if(direction<0&&distance>=24&&distance<=approachRange){
+   if(gestureStart>=target-32){animateTo(target);return}
+   const hero=document.querySelector('#top');
+   if(hero)animateTo(hero.getBoundingClientRect().top+scrollY);
+  }
+ };
+ const noteGesture=()=>{const now=performance.now();if(now-lastInput>500)gestureStart=scrollY;lastInput=now};
+ addEventListener('touchstart',()=>{noteGesture();cancel();touching=true},{passive:true});
+ addEventListener('touchend',()=>{touching=false;clearTimeout(timer);timer=setTimeout(settle,direction<0?650:240)},{passive:true});
+ addEventListener('touchcancel',()=>{touching=false;cancel()},{passive:true});
+ addEventListener('wheel',()=>{noteGesture();if(settling)cancel()},{passive:true});
+ addEventListener('pointerdown',()=>{if(settling)cancel()},{passive:true});
+ addEventListener('keydown',e=>{if(['ArrowUp','ArrowDown','PageUp','PageDown','Home','End',' '].includes(e.key))cancel()});
+ addEventListener('resize',cancel,{passive:true});
+ addEventListener('scroll',()=>{const delta=scrollY-lastY;lastY=scrollY;clearTimeout(timer);if(!settling){if(Math.abs(delta)>1)direction=Math.sign(delta);timer=setTimeout(settle,direction<0?650:240)}},{passive:true});
 })();
-// Match the portrait's lower corners to its backing while retaining the left extension.
+// Clip only the bottom corners; leave the projecting sleeve unobstructed.
 (()=>{
  const frame=document.querySelector('#about-panel-0 .compact-about__portrait-frame');if(!frame)return;
  const update=()=>{
-  if(!matchMedia('(min-width:601px) and (max-width:1100px)').matches){frame.style.removeProperty('clip-path');return}
-  const w=frame.clientWidth,h=frame.clientHeight,r=22,left=-90;
+  if(!matchMedia('(max-width:1100px)').matches){frame.style.removeProperty('clip-path');return}
+  const stacked=matchMedia('(max-width:600px)').matches;
+  const w=frame.clientWidth,h=frame.clientHeight,r=stacked?14:22,left=-120;
   if(!w||!h)return;
-  frame.style.clipPath=`path("M ${left+r} 0 H ${w-r} A ${r} ${r} 0 0 1 ${w} ${r} V ${h-r} A ${r} ${r} 0 0 1 ${w-r} ${h} H ${r} A ${r} ${r} 0 0 1 0 ${h-r} H ${left+r} Q ${left} ${h-r} ${left} ${h-2*r} V ${r} Q ${left} 0 ${left+r} 0 Z")`;
+  frame.style.setProperty('--portrait-width',`${Math.max(260,h*.84)}px`);
+  frame.style.clipPath=`path("M ${left} 0 H ${w-r} Q ${w} 0 ${w} ${r} V ${h-r} Q ${w} ${h} ${w-r} ${h} H ${r} C ${left} ${h} ${left} ${h} ${left} ${h-2*r} Z")`;
  };
  new ResizeObserver(update).observe(frame);addEventListener('resize',update,{passive:true});update();
+})();
+// Keep the case rail anchored to the viewport through the final case links.
+(()=>{
+ document.querySelectorAll('.case-study').forEach(panel=>{
+  const scroller=panel.querySelector('.case-study__scroll'),body=panel.querySelector('.case-study__body'),rail=panel.querySelector('.case-study__rail');
+  if(!scroller||!body||!rail)return;
+  const update=()=>{
+   const pin=matchMedia('(min-width:1101px)').matches&&body.getBoundingClientRect().top<=panel.getBoundingClientRect().top;
+   if(pin)rail.style.setProperty('--case-rail-width',getComputedStyle(body).gridTemplateColumns.split(' ')[0]);
+   rail.classList.toggle('is-viewport-pinned',pin);
+  };
+  scroller.addEventListener('scroll',update,{passive:true});addEventListener('resize',update,{passive:true});
+  new ResizeObserver(update).observe(body);update();
+ });
 })();

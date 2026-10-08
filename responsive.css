@@ -659,3 +659,38 @@ html body [data-before-after]:focus-within{outline:none!important}
  .contact{border-top:2px solid #fff}
  .contact:after{box-shadow:inset 0 3px 0 2px #fff,inset 0 72px 64px 12px #fff,inset 0 0 44px 18px rgba(255,255,255,.82),inset 0 -64px 58px rgba(255,255,255,.72)}
 }
+/* Approved photo: tilted cutout composition from Figma 157:3. */
+@media(min-width:1101px){
+ .resume-card--identity .resume-portrait--base{left:-178px;width:346px;border-radius:0;clip-path:path("M 0 0 H 322 A 24 24 0 0 1 346 24 V 454 A 24 24 0 0 1 322 478 H 202 A 24 24 0 0 1 178 454 V 430 H 0 Z")}
+ .resume-card--identity .resume-portrait--base img{left:50px;top:0;width:360px;height:536.6px;object-fit:contain;transform:rotate(-11.58deg);transform-origin:center}
+}
+@media(max-width:1100px){
+ #about-panel-0 .compact-about__portrait-frame .compact-about__portrait{position:absolute;left:42%;top:-12px;width:var(--portrait-width,280px);height:auto;aspect-ratio:auto;min-height:0;max-height:none;max-width:none;margin:0;object-fit:contain;transform:translateX(-42%) rotate(-11.58deg);transform-origin:center}
+}
+@media(max-width:600px){
+ #about-panel-0 .compact-about__portrait-frame{height:clamp(340px,calc(65vw + 100px),450px);background:radial-gradient(ellipse at 40% 80%,#4fcffd,#e4f8ff);overflow:visible;border-radius:14px}
+ #about-panel-0 .compact-about__portrait-frame::before{content:none}
+ #about-panel-0 .compact-about__portrait-frame .compact-about__portrait{left:calc(50% + clamp(0px,calc(90px - 15vw),35px));right:auto;top:-15px;width:clamp(350px,calc(50vw + 165px),440px);transform:translateX(-50%) rotate(-11.58deg)}
+}
+
+@media(max-width:600px){
+ .compact-about__stage:has(#about-panel-0:not([hidden])),#about-panel-0{overflow:visible}
+ .compact-about{overflow-x:clip}
+}
+@media(min-width:1101px){
+ .case-study__rail.is-viewport-pinned{position:fixed;top:0;left:0;width:var(--case-rail-width);height:100svh;box-sizing:border-box}
+ .case-study__body>.case-study__content{grid-column:2}
+}
+/* Keep breathing room between sections; the scroll stop targets the Work label. */
+.cases__heading{height:120px;min-height:0;line-height:1.4;padding-top:0;padding-bottom:24px;margin:0}
+@media(max-width:1100px){.compact-about{padding-bottom:72px}.cases__heading{padding-top:12px;padding-bottom:8px}}
+/* One full-card fade: an inner media overlay exposes a rectangular white edge. */
+.cases>.case .case__media{mask-image:none;-webkit-mask-image:none}
+.cases>.case .case__media::after{content:none;display:none}
+.cases>.case .case__video-fade{display:none}
+.cases>.case::after{bottom:-1px;border-radius:0}
+@media(max-width:1100px){
+ .cases>.case::after,.cases>.case--shared-fade::after{left:0;right:0;bottom:-1px;height:clamp(100px,18vw,180px);background:linear-gradient(to bottom,rgba(255,255,255,0),rgba(255,255,255,.65) 55%,#fff 96%,#fff);box-shadow:none}
+}
+/* Discard background residue above the cutout, clear of the raised hand. */
+.resume-card--identity .resume-portrait--base img,#about-panel-0 .compact-about__portrait-frame .compact-about__portrait{clip-path:inset(9% 0 0 0)}
