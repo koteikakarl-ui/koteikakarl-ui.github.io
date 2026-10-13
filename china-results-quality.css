@@ -1,0 +1,14 @@
+/* Use the original artwork at full resolution inside the existing card geometry. */
+#special-china .china-results figure:first-child{background:linear-gradient(180deg,#ffe632 0%,#ffed69 55%,#fff7ba 100%);border-radius:10%}
+#special-china .china-results figure:first-child img{object-fit:cover;object-position:56% center;transform:none}
+#special-china .china-results figure:nth-child(2){border-radius:8%}
+#special-china .china-results figure:nth-child(2) img{object-fit:cover;transform:none}
+
+/* Crop full-resolution source scenes in CSS, retaining the small variant cards. */
+.china-variants .china-variant-frame{position:relative;width:100%;aspect-ratio:242/250;margin:0;border-radius:22px;overflow:hidden;background:#fff}
+.china-variants .china-variant-frame:nth-child(2){transform:translateY(28px)}
+.china-variants .china-variant-frame img{position:absolute;max-width:none;width:204.8%;height:auto;transform:none!important;border-radius:0}
+.china-variants .china-variant-frame:nth-child(1) img{left:-80%;top:-43.56%}
+.china-variants .china-variant-frame:nth-child(2) img{left:-97%;top:-29.04%}
+.china-variants .china-variant-frame:nth-child(3) img{left:-95%;top:-24.2%}
+@media(max-width:1100px){.china-variants .china-variant-frame{border-radius:12px}.china-variants .china-variant-frame:nth-child(2){transform:translateY(16px)}}

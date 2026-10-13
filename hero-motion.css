@@ -1,0 +1,3 @@
+/* Entire portals tilt together; their nested masks never get a separate transform. */
+.portal-stage--hero .portal-group,.portal-stage--hero>.portal-asset{transform-origin:center center;will-change:translate,rotate,transform}
+@media(prefers-reduced-motion:reduce){.portal-stage--hero .portal-group,.portal-stage--hero .portal-creative,.portal-stage--hero>.portal-asset{translate:none!important;rotate:none!important;transform:none!important;will-change:auto}}

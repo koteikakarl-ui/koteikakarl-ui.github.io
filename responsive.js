@@ -6,7 +6,7 @@
  const compact=el('section','compact-about');compact.id='about-mobile';compact.setAttribute('aria-label','Обо мне');
  const nav=el('div','compact-about__nav');nav.setAttribute('role','tablist');nav.setAttribute('aria-label','Разделы обо мне');
  const stage=el('div','compact-about__stage');
- const labels=['Кто я','Опыт и роли','Вклад и отзывы','Инструменты'];
+ const labels=['Кто я','Опыт и роли','Инструменты'];
  const panels=labels.map((label,i)=>{
   const b=el('button','compact-about__tab',label);b.type='button';b.id='about-tab-'+i;b.setAttribute('role','tab');b.setAttribute('aria-controls','about-panel-'+i);nav.append(b);
   const p=el('article','compact-about__panel');p.id='about-panel-'+i;p.setAttribute('role','tabpanel');p.setAttribute('aria-labelledby',b.id);stage.append(p);return p;
@@ -15,7 +15,7 @@
  navShell.append(nav);compact.append(sentinel,navShell,stage);resume.before(compact);
  new IntersectionObserver(([entry])=>navShell.classList.toggle('is-stuck',!entry.isIntersecting&&entry.boundingClientRect.top<0),{threshold:0}).observe(sentinel);
  const intro=el('div','compact-about__intro'),portrait=el('img','compact-about__portrait');
- portrait.src='assets/about-portrait-003.png';portrait.alt='Портрет Даши';portrait.loading='lazy';
+ portrait.src='assets/portals/about-portrait-current.png?v=about-photo-3';portrait.alt='Портрет Даши';portrait.loading='lazy';
  const copy=el('div','compact-about__copy');copy.append(el('p','eyebrow',text('.resume-kicker')),el('h2','','Коммуникационный дизайнер'),el('p','',text('.resume-body')));
  const principle=el('div','compact-about__principle');principle.append(el('p','eyebrow','МОЙ ПОДХОД'),el('h3','',text('.resume-principle__copy')));
  const portraitFrame=el('div','compact-about__portrait-frame');portraitFrame.append(portrait);copy.append(principle);intro.append(portraitFrame,copy);panels[0].append(intro);
@@ -43,25 +43,12 @@
   };
   const rows=[...experience.querySelectorAll('.compact-about__experience')];
   rows.forEach(row=>connect(point(row.querySelector('.compact-about__identity'),'bottom'),point(row.querySelector('.compact-about__experience-copy'),'top')));
-  if(rows.length===2)connect(point(rows[0].querySelector('.compact-about__experience-copy'),'bottom'),point(rows[1].querySelector('.compact-about__identity'),'top'),true);
+  for(let i=0;i<rows.length-1;i++)connect(point(rows[i].querySelector('.compact-about__experience-copy'),'bottom'),point(rows[i+1].querySelector('.compact-about__identity'),'top'),true);
  }
  new ResizeObserver(drawExperience).observe(experience);
  document.fonts.ready.then(drawExperience);
 
- panels[2].append(el('h2','',text('.resume-card--impact h3')));
- const impacts=el('div','compact-about__examples');
- resume.querySelectorAll('.impact-grid > div').forEach(item=>{
-  const row=el('article','compact-about__example'),link=el('a','compact-about__thumbnail');
-  const original=item.querySelector('a');link.href=original.href;link.setAttribute('aria-label',original.getAttribute('aria-label'));
-  // Existing delegated case navigation also serves these links.
-  link.dataset.impactCase=original.dataset.impactCase;link.dataset.impactSection=original.dataset.impactSection;
-  link.append(item.querySelector('img').cloneNode(true));
-  const body=el('div'),heading=el('h3'),titleLink=link.cloneNode(false);titleLink.className='compact-about__case-title';titleLink.append(el('span','',item.querySelector('h4').textContent),el('span','compact-about__case-arrow','↗'));heading.append(titleLink);body.append(heading,el('p','',item.querySelector('p').textContent));row.append(link,body);impacts.append(row);
- });panels[2].append(impacts);
- const reviews=el('div','compact-about__reviews'),quotes=el('div','compact-about__quotes');
- resume.querySelectorAll('.review-track blockquote').forEach(q=>quotes.append(q.cloneNode(true)));
- reviews.append(quotes);panels[2].append(reviews);
- panels[3].append(el('p','eyebrow','ПРАКТИКА И ВЕКТОР'),el('h2','',text('.practice-main h3')));
+ panels[2].append(el('p','eyebrow','ПРАКТИКА И ВЕКТОР'),el('h2','',text('.practice-main h3')));
  const tools=el('div','compact-about__tool-slider'),icons=el('div','compact-about__icons'),description=el('div','compact-about__tool-copy');
  description.setAttribute('aria-live','polite');
  const toolButtons=[...resume.querySelectorAll('.resume-stack button')];
@@ -107,30 +94,23 @@
   const source=toolButtons[saved];description.replaceChildren(el('h3','',source.dataset.tool),el('p','',source.dataset.description));
  }
  icons.addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight'].includes(e.key))return;e.preventDefault();showTool(toolIndex+(e.key==='ArrowRight'?1:-1));belt.children[physical]?.focus({preventScroll:true})});
- let wheelTime=0;icons.addEventListener('wheel',e=>{if(Math.abs(e.deltaX)<Math.abs(e.deltaY))return;e.preventDefault();if(Date.now()-wheelTime>300){wheelTime=Date.now();showTool(toolIndex+(e.deltaX>0?1:-1))}},{passive:false});
- tools.append(icons,description);panels[3].append(tools);
- const next=el('div','compact-about__next');next.append(el('p','eyebrow','ОСВАИВАЮ ДАЛЬШЕ'),el('h3','',text('.practice-next h4')),el('p','',text('.next-copy')));next.lastElementChild.innerHTML=resume.querySelector('.next-copy').innerHTML;panels[3].append(next);showTool(0,false);
- const swipe=(surface,move)=>{let start;surface.addEventListener('touchstart',e=>{if(e.target.closest('.compact-about__icons'))return;const t=e.touches[0];start={x:t.clientX,y:t.clientY}},{passive:true});surface.addEventListener('touchend',e=>{if(!start)return;const t=e.changedTouches[0],dx=t.clientX-start.x,dy=t.clientY-start.y;if(Math.abs(dx)>48&&Math.abs(dx)>Math.abs(dy)*1.5){e.stopPropagation();move(dx<0?1:-1)}start=null},{passive:true})};
- let reviewIndex=0;
- const dots=el('div','compact-about__dots');dots.setAttribute('aria-label','Отзывы');
- const showReview=i=>{reviewIndex=(i+quotes.children.length)%quotes.children.length;[...quotes.children].forEach((q,j)=>q.hidden=j!==reviewIndex);[...dots.children].forEach((b,j)=>b.setAttribute('aria-current',String(j===reviewIndex)))};
- [...quotes.children].forEach((q,i)=>{const b=el('button');b.type='button';b.setAttribute('aria-label','Показать отзыв '+(i+1));b.addEventListener('click',()=>showReview(i));dots.append(b)});
- reviews.append(dots);showReview(0);let reviewY=null;
- reviews.addEventListener('touchstart',e=>{reviewY=e.touches[0].clientY},{passive:true});
- reviews.addEventListener('touchend',e=>{if(reviewY!==null){const dy=e.changedTouches[0].clientY-reviewY;if(Math.abs(dy)>42)showReview(reviewIndex+(dy<0?1:-1));reviewY=null}},{passive:true});
- dots.addEventListener('keydown',e=>{if(!['ArrowUp','ArrowDown'].includes(e.key))return;e.preventDefault();showReview(reviewIndex+(e.key==='ArrowDown'?1:-1));dots.children[reviewIndex].focus()});// Drag the icon belt directly; preserve vertical page scrolling.
+ let wheelTime=0;tools.addEventListener('wheel',e=>{if(Math.abs(e.deltaX)<Math.abs(e.deltaY))return;e.preventDefault();if(Date.now()-wheelTime>300){wheelTime=Date.now();showTool(toolIndex+(e.deltaX>0?1:-1))}},{passive:false});
+ tools.append(icons,description);panels[2].append(tools);tools.addEventListener('portfolio-tool-next',()=>showTool(toolIndex+1));
+ const next=el('div','compact-about__next');next.append(el('p','eyebrow','ОСВАИВАЮ ДАЛЬШЕ'),el('h3','',text('.practice-next h4')),el('p','',text('.next-copy')));next.lastElementChild.innerHTML=resume.querySelector('.next-copy').innerHTML;panels[2].append(next);showTool(0,false);
+ const swipe=(surface,move)=>{let start;surface.addEventListener('touchstart',e=>{if(e.target.closest('.compact-about__tool-slider'))return;const t=e.touches[0];start={x:t.clientX,y:t.clientY}},{passive:true});surface.addEventListener('touchend',e=>{if(!start)return;const t=e.changedTouches[0],dx=t.clientX-start.x,dy=t.clientY-start.y;if(Math.abs(dx)>48&&Math.abs(dx)>Math.abs(dy)*1.5){e.stopPropagation();move(dx<0?1:-1)}start=null},{passive:true})};
+ // Drag the icon belt directly; preserve vertical page scrolling.
  let drag=null,suppressClick=false;
- icons.addEventListener('pointerdown',e=>{if(e.button!==0)return;clearTimeout(settleTimer);rebaseBelt();drag={id:e.pointerId,x:e.clientX,y:e.clientY,dx:0,horizontal:false};});
- icons.addEventListener('pointermove',e=>{if(!drag)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(!drag.horizontal&&Math.abs(dx)>8&&Math.abs(dx)>Math.abs(dy)){drag.horizontal=true;icons.setPointerCapture(e.pointerId)}if(!drag.horizontal)return;drag.dx=dx;belt.style.transition='none';belt.style.transform='translateX('+(-physical*76+dx)+'px)';
+ tools.addEventListener('pointerdown',e=>{if(e.button!==0)return;clearTimeout(settleTimer);rebaseBelt();drag={id:e.pointerId,x:e.clientX,y:e.clientY,dx:0,horizontal:false};});
+ tools.addEventListener('pointermove',e=>{if(!drag)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(!drag.horizontal&&Math.abs(dx)>8&&Math.abs(dx)>Math.abs(dy)){drag.horizontal=true;tools.setPointerCapture(e.pointerId)}if(!drag.horizontal)return;drag.dx=dx;belt.style.transition='none';belt.style.transform='translateX('+(-physical*76+dx)+'px)';
  [...belt.children].forEach((b,j)=>{const d=Math.abs(j-physical+dx/76);b.style.transition='none';b.style.filter='blur('+Math.min(5,d*1.35)+'px)';b.style.opacity=String(Math.max(.18,1-d*.22));b.style.transform='scale('+Math.max(.66,1-d*.12)+')'})});
  const finishDrag=e=>{if(!drag)return;const d=drag;drag=null;if(d.horizontal){suppressClick=true;setTimeout(()=>suppressClick=false,0);const steps=Math.max(-3,Math.min(3,Math.round(-d.dx/76)));showTool(toolIndex+steps)}};
- icons.addEventListener('pointerup',finishDrag);icons.addEventListener('pointercancel',()=>{drag=null;renderBelt()});
+ tools.addEventListener('pointerup',finishDrag);tools.addEventListener('pointercancel',()=>{drag=null;renderBelt()});
  icons.addEventListener('click',e=>{if(suppressClick){e.preventDefault();e.stopImmediatePropagation()}},true);
 
  let active=0;
  const tabs=[...nav.children],reduced=matchMedia('(prefers-reduced-motion:reduce)');
- function showPanel(i,focus=false){active=(i+4)%4;panels.forEach((p,j)=>{p.hidden=j!==active;p.inert=j!==active});tabs.forEach((b,j)=>{b.classList.toggle('is-passed',j<active);b.setAttribute('aria-selected',String(j===active));b.tabIndex=j===active?0:-1});if(focus)tabs[active].focus();{const r=tabs[active].getBoundingClientRect(),n=nav.getBoundingClientRect();if(r.left<n.left+20||r.right>n.right-20)nav.scrollTo({left:nav.scrollLeft+r.left-n.left-20,behavior:reduced.matches?'instant':'smooth'})}}
- tabs.forEach((b,i)=>{b.addEventListener('click',()=>showPanel(i));b.addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;e.preventDefault();showPanel(e.key==='Home'?0:e.key==='End'?3:active+(e.key==='ArrowRight'?1:-1),true)})});
+ function showPanel(i,focus=false){active=(i+panels.length)%panels.length;panels.forEach((p,j)=>{p.hidden=j!==active;p.inert=j!==active});tabs.forEach((b,j)=>{b.classList.toggle('is-passed',j<active);b.setAttribute('aria-selected',String(j===active));b.tabIndex=j===active?0:-1});if(focus)tabs[active].focus();{const r=tabs[active].getBoundingClientRect(),n=nav.getBoundingClientRect();if(r.left<n.left+20||r.right>n.right-20)nav.scrollTo({left:nav.scrollLeft+r.left-n.left-20,behavior:reduced.matches?'instant':'smooth'})}}
+ tabs.forEach((b,i)=>{b.addEventListener('click',()=>showPanel(i));b.addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;e.preventDefault();showPanel(e.key==='Home'?0:e.key==='End'?panels.length-1:active+(e.key==='ArrowRight'?1:-1),true)})});
  swipe(stage,d=>showPanel(active+d));showPanel(0);
  let measuredWidth=0;const measure=()=>{if(!compact.offsetWidth)return;sizeToolCopy()};
  new ResizeObserver(()=>{if(compact.clientWidth!==measuredWidth){measuredWidth=compact.clientWidth;measure()}}).observe(compact);
@@ -191,7 +171,9 @@
   const target=about.getBoundingClientRect().top+scrollY+(compact?parseFloat(getComputedStyle(section).paddingTop):0);
   const distance=target-scrollY;
   // The same transition zone leads to About going down and to the hero going up.
-  const approachRange=Math.min(innerHeight*.7,640);
+  const portalDesktop=!compact&&document.body.classList.contains('portal-redesign');
+  const heroHeight=document.querySelector('#top')?.offsetHeight||innerHeight;
+  const approachRange=portalDesktop?Math.min(Math.max(innerHeight*.7,heroHeight*.85),960):Math.min(innerHeight*.7,640);
   if(direction>0&&distance<=approachRange&&distance>=-64&&Math.abs(distance)>=2)animateTo(target);
   else if(direction<0&&distance>=24&&distance<=approachRange){
    if(gestureStart>=target-32){animateTo(target);return}

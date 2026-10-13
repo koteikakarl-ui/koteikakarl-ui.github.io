@@ -26,6 +26,15 @@
     }
     return value;
   }
+  function russianTypography(value) {
+    // Glue short function words to the following word without changing translation keys.
+    const words="а|и|или|но|не|ни|да|бы|же|ли|как|что|в|во|на|с|со|к|ко|у|о|об|обо|от|до|из|за|по|под|над|при|для|без|через|между|перед|про|после|вне|кроме|ради|сквозь|среди|возле|вдоль|вместо|мимо|вокруг|из-за|из-под";
+    const pattern=new RegExp('(^|[\\s(«—–])('+words+')[ \\t\\r\\n]+(?=\\S)','giu');
+    let result=value;
+    for(let i=0;i<12;i++){const next=result.replace(pattern,(_,space,word)=>space+word+'\u00a0');if(next===result)break;result=next;}
+    return result.replace(/(\d+(?:[,.]\d+)?) +(?=%|(?:год(?:а|ов)?|лет|дн(?:я|ей))(?=$|[^\p{L}]))/giu,'$1\u00a0');
+  }
+  window.portfolioRussianTypography = russianTypography;
   function updateValue(node, key, value, write) {
     let saved = originals.get(node);
     if (!saved) { saved = new Map(); originals.set(node,saved); }
@@ -35,7 +44,7 @@
       entry = { ru: initialPass || language === 'ru' || /[а-яё]/iu.test(value) ? value : translate(value,'ru'), last: value };
       saved.set(key,entry);
     }
-    const next = language === 'en' ? translate(entry.ru,'en') : entry.ru;
+    const next = language === 'en' ? translate(entry.ru,'en') : (key==='text'?russianTypography(entry.ru):entry.ru);
     if (value !== next) write(next);
     entry.last = next;
   }

@@ -694,3 +694,22 @@ html body [data-before-after]:focus-within{outline:none!important}
 }
 /* Discard background residue above the cutout, clear of the raised hand. */
 .resume-card--identity .resume-portrait--base img,#about-panel-0 .compact-about__portrait-frame .compact-about__portrait{clip-path:inset(9% 0 0 0)}
+
+/* Text revision: small experience line follows the existing role label. */
+.hero__proof{display:block;margin-top:12px;font-size:14px;line-height:1.4}
+
+/* Compact case summaries sit before the process visuals. */
+.case-highlights{list-style:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;padding:0;margin:24px 0 32px}
+.case-highlights li{padding:18px 20px;border:1px solid #e5e5eb;border-radius:18px;background:#f8f8fb;min-width:0}
+.case-highlights strong{display:block;font-size:18px;line-height:1.3;color:#25252c}
+.case-highlights span{display:block;margin-top:8px;font-size:14px;line-height:1.5;color:#62626f}
+@media(max-width:700px){.case-highlights{grid-template-columns:1fr;gap:10px}.case-highlights li{padding:15px 18px}}
+
+/* Hero value propositions remain separate from the animated artwork. */
+.hero-highlights{position:absolute;z-index:4;left:var(--gutter);right:var(--gutter);bottom:44px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px;list-style:none;margin:0;padding:28px 30px;background:rgba(255,255,255,.95);border:1px solid rgba(31,31,31,.08);border-radius:28px;box-shadow:0 12px 40px rgba(40,35,60,.09)}
+.hero-highlights li{min-width:0;padding-left:20px;position:relative}
+.hero-highlights li:before{content:"";position:absolute;left:0;top:5px;width:9px;height:9px;border-radius:3px;background:#b4adcf;transform:rotate(8deg)}
+.hero-highlights strong{display:block;font-size:19px;font-weight:600;line-height:1.3}
+.hero-highlights span{display:block;margin-top:8px;font-size:14px;line-height:1.5;color:#747181}
+@media(max-width:1100px){.hero-highlights{grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;padding:24px;bottom:24px}.hero__name-art{bottom:280px!important}}
+@media(max-width:600px){.hero{height:auto!important;min-height:100svh!important;padding-bottom:24px}.hero__parallax-layer{position:relative!important;min-height:430px;padding-top:110px!important}.hero__name-art{bottom:36px!important}.hero-highlights{position:relative;left:auto;right:auto;bottom:auto;margin:0 var(--gutter);padding:20px 18px;gap:22px 14px;border-radius:22px}.hero-highlights li{padding-left:16px}.hero-highlights strong{font-size:16px}.hero-highlights span{font-size:13px}.hero__role{max-width:100%}}

@@ -1,0 +1,5 @@
+/* Hero and compact About share one backdrop; no white overlay at their join. */
+@media(max-width:1100px){
+ .portal-redesign .compact-about::before{content:none!important;display:none!important;background:none!important}
+}
+.footer-contact .footer-reviews__heading{margin-bottom:28px}

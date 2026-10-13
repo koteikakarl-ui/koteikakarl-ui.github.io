@@ -1,0 +1,222 @@
+.portal-redesign .portal-old-about,.portal-redesign .inspiration{display:none!important}
+.portal-redesign main{max-width:1440px}
+.portal-redesign .portal-hero,.portal-about{position:relative!important;overflow:visible;isolation:isolate;background:radial-gradient(ellipse 88% 132% at 10.5% 28%,#fff 0%,#fff9f4 32%,#fffdeb 67%,#e1fff5 100%)!important}
+.portal-redesign .portal-hero{height:980px!important;min-height:0!important;max-height:none!important;transform:none!important;opacity:1!important}
+.portal-redesign .portal-hero:before{display:none!important}
+.portal-redesign .portal-hero:after,.portal-about:after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;box-shadow:inset 0 0 51px #fff,inset 0 -29px 52px #fff;background:none!important}
+.portal-art{position:absolute;top:0;bottom:0;left:50%;width:100vw;transform:translateX(-50%);overflow:visible;pointer-events:none;z-index:0}
+.portal-stage{position:absolute;top:0;left:50%;width:1440px;margin-left:-720px;transform:scale(var(--portal-scale,1));transform-origin:50% 0}
+.portal-art:before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 88% 132% at 10.5% 28%,#fff 0%,#fff9f4 32%,#fffdeb 67%,#e1fff5 100%);box-shadow:inset 0 0 51px #fff}
+.portal-asset{position:absolute;max-width:none;display:block;object-fit:contain}
+.portal-redesign .portal-hero .nav{top:35px;z-index:3;padding:0 5%;font-size:14px;align-items:center;transform:none!important;opacity:1!important}
+.portal-redesign .portal-hero .nav__meta{margin-right:auto;margin-left:16px;display:block}
+.portal-redesign .portal-hero .nav__links{gap:28px}
+.portal-eyebrow{position:absolute;top:499px;width:100%;text-align:center;font-size:14px;font-weight:500;z-index:2}
+.portal-title{position:absolute;top:558px;left:5%;width:90%;font-size:clamp(36px,3.96vw,57px);font-weight:600;line-height:1.1;text-align:center;z-index:2;white-space:nowrap}
+.portal-redesign .hero-highlights{position:absolute;top:668px;bottom:auto;left:5%;right:5%;border:5px solid transparent;background:rgba(255,255,255,.75);background-clip:padding-box;backdrop-filter:blur(94px);box-shadow:none;gap:24px;grid-template-columns:repeat(4,minmax(0,1fr));padding:28px 30px;z-index:3}
+.portal-redesign .hero-highlights li{padding-left:20px}
+.portal-redesign .hero-highlights li:before{display:none}
+.portal-redesign .hero-highlights strong{font-size:19px;line-height:1.45}
+.portal-redesign .hero-highlights span{max-width:250px;font-size:14px;line-height:1.45}
+.portal-down{position:absolute;top:879px;left:calc(50% - 22.5px);z-index:3;width:45px;height:25px}
+.portal-down img{width:45px;height:25px;display:block}
+.portal-about{height:720px;margin-top:138px}
+.portal-about-layout{position:relative;z-index:2;display:grid;grid-template-columns:250px 1fr;column-gap:54px;padding:30px 60px;width:100%;height:100%}
+.portal-about-rail{display:flex;flex-direction:column;justify-content:space-between;padding:10px 0 20px;font-size:16px}
+.portal-about-rail nav{position:relative;display:flex;flex-direction:column;gap:70px;padding-left:24px}
+.portal-about-rail nav:before{content:"";position:absolute;left:5px;top:20px;bottom:20px;width:1px;background:rgba(20,20,20,.2)}
+.portal-about-rail button{position:relative;text-align:left;background:none;border:0;color:#141414;padding:0;font:500 16px/20px Inter,Arial,sans-serif;cursor:pointer}
+.portal-about-rail button:before{content:"";position:absolute;left:-21.5px;top:6px;border-radius:50%;width:7px;height:7px;background:#737373}
+.portal-about-rail button.is-active{font-size:32px;line-height:34px;font-weight:600}
+.portal-about-rail button.is-active:before{left:-24px;top:10px;width:12px;height:12px;background:#ff450d}
+.portal-about-pane{position:relative;min-width:0;width:816px;max-width:100%;height:660px}
+.portal-identity{position:relative;width:100%;height:100%}
+.portal-identity-card{position:absolute;inset:0;border:5px solid transparent;border-radius:48px;background:linear-gradient(#fff,#fff) padding-box,linear-gradient(110deg,#ffdf96,#fff4be,#ccf9e0) border-box}
+.portal-greeting,.portal-identity h2,.portal-specialities,.portal-bio,.portal-principle-label,.portal-principle{position:absolute;left:264px;right:48px}
+.portal-greeting{top:48px;font-size:12px;line-height:16px;color:rgba(46,46,46,.55)}
+.portal-identity h2{top:82px;font-size:36px;line-height:42px;font-weight:600}
+.portal-specialities{top:172px;font-size:12px;color:#ff450d;font-weight:600;line-height:16px}
+.portal-bio{top:207px;font-size:16px;line-height:22px;color:rgba(46,46,46,.82)}
+.portal-principle-label{top:408px;left:420px;font-size:12px;line-height:16px;color:#777}
+.portal-principle{top:460px;left:420px;font-size:24px;line-height:30px;font-weight:500}
+.portal-portrait{position:absolute;left:-82px;top:36px;width:286px;height:586px;max-width:none;object-fit:contain}
+.portal-about-pane>[data-portal-content][hidden]{display:none!important}
+.portal-about-pane>.resume-card{position:relative!important;inset:auto!important;transform:none!important;opacity:1!important;filter:none!important;border-radius:48px;width:816px!important;max-width:100%;height:660px!important;background:#fff}
+@media(max-width:1100px){.portal-title{font-size:4vw}.portal-redesign .hero-highlights{grid-template-columns:repeat(2,minmax(0,1fr));padding:24px;gap:20px}.portal-redesign .hero-highlights li{padding-left:20px}.portal-about-layout{padding:30px 5%;grid-template-columns:180px 1fr;gap:28px}.portal-about-pane{width:100%}.portal-greeting,.portal-identity h2,.portal-specialities,.portal-bio{left:200px;right:24px}.portal-identity h2{font-size:28px;line-height:34px}.portal-principle-label,.portal-principle{left:240px;right:24px}.portal-portrait{left:-35px;width:210px;object-fit:cover;object-position:left}.portal-about-pane>.resume-card{height:auto!important;min-height:660px}}
+@media(max-width:650px){.portal-redesign .portal-hero{height:830px!important}.portal-redesign .portal-hero .nav{flex-wrap:wrap;gap:18px}.portal-redesign .portal-hero .nav__meta{font-size:11px;margin-left:8px}.portal-redesign .portal-hero .nav__links{width:100%;justify-content:space-between;gap:12px;font-size:12px}.portal-art{opacity:.86}.portal-hero .portal-asset{height:auto!important}.portal-eyebrow{top:340px}.portal-title{top:383px;white-space:normal;font-size:30px;line-height:1.15}.portal-redesign .hero-highlights{top:492px;margin:0;padding:20px 16px;gap:20px 12px}.portal-redesign .hero-highlights strong{font-size:15px;line-height:1.35}.portal-redesign .hero-highlights span{font-size:12px;line-height:1.45}.portal-down{top:760px}.portal-about{height:auto;min-height:940px;margin-top:64px}.portal-about-layout{display:flex;flex-direction:column;padding:24px 5%;gap:24px}.portal-about-rail{padding:0;gap:20px}.portal-about-rail nav{flex-direction:row;gap:16px;overflow-x:auto;padding:0}.portal-about-rail nav:before,.portal-about-rail button:before{display:none}.portal-about-rail button,.portal-about-rail button.is-active{font-size:14px;line-height:18px;flex-shrink:0}.portal-about-rail button.is-active{color:#ff450d}.portal-about-rail>a{display:none}.portal-about-pane{height:760px}.portal-identity-card{border-radius:28px}.portal-portrait{left:16px;top:28px;width:125px;height:255px;object-fit:contain}.portal-greeting,.portal-identity h2,.portal-specialities{left:158px;right:16px}.portal-greeting{top:36px;font-size:10px}.portal-identity h2{top:70px;font-size:21px;line-height:27px;overflow-wrap:anywhere}.portal-specialities{top:150px;font-size:10px;line-height:16px}.portal-bio{left:24px;right:24px;top:315px;font-size:16px;line-height:24px}.portal-principle-label{left:24px;right:24px;top:550px}.portal-principle{left:24px;right:24px;top:590px;font-size:22px;line-height:30px}.portal-about-pane>.resume-card{width:100%!important;height:auto!important;min-height:760px;padding:24px!important;overflow:auto!important}.portal-about .portal-asset{opacity:.6}}
+
+/* Separate the translucent stroke from the translucent fill. */
+.portal-redesign .hero-highlights:before{content:"";position:absolute;inset:-5px;pointer-events:none;border-radius:inherit;padding:5px;background:linear-gradient(110deg,rgba(255,170,0,.22),rgba(255,236,95,.22),rgba(144,240,209,.22));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+.portal-redesign .portal-hero{overflow:visible!important;padding-bottom:0!important}
+.portal-about{overflow:visible;z-index:1}
+.portal-about .portal-art{mask-image:linear-gradient(#000 0%,#000 78%,transparent 100%)}
+.portal-about .portal-asset{opacity:1}
+.portal-about-rail,.portal-about-pane{z-index:2}
+.portal-redesign .portal-hero:after{left:50%;right:auto;width:100vw;transform:translateX(-50%)}
+.portal-redesign .portal-art,.portal-stage,.portal-asset{animation:none!important;transition:none!important}
+@media(max-width:650px){.portal-art{opacity:1}.portal-redesign .hero-highlights li{padding-left:0}.portal-redesign .hero-highlights{backdrop-filter:blur(94px);-webkit-backdrop-filter:blur(94px)}.portal-about .portal-asset{opacity:1}}
+
+/* Preserve the original gallery, review carousel, tools and process controllers. */
+@media(min-width:1101px){
+ .portal-redesign .portal-resume{display:block!important;margin-top:138px}
+ .portal-resume .about-gallery-stage{isolation:isolate;overflow:visible}
+ .portal-resume .about-composition{z-index:2}
+ .portal-resume .portal-art{mask-image:linear-gradient(#000 0%,#000 80%,transparent 100%)}
+ .portal-resume .resume-card--identity{border:5px solid rgba(255,205,114,.22);border-radius:48px;background:#fff}
+ .portal-resume .resume-card--identity:before{display:none}
+ .portal-resume .resume-card--identity h3{background:none;color:#141414;-webkit-text-fill-color:#141414}
+ .portal-resume .resume-card--identity .resume-portrait-group{left:36px}
+ .portal-restored-portrait{position:absolute;left:-118px;top:36px;width:286px;height:478px;object-fit:contain;object-position:bottom}
+}
+
+/* One stationary backdrop; only the appearance changes for About. */
+.portal-redesign{--portal-outline:linear-gradient(110deg,rgba(255,170,0,.22),rgba(255,236,95,.22),rgba(144,240,209,.22));isolation:isolate}
+.portal-backdrop{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 88% 132% at 10.5% 28%,#fff 0%,#fff9f4 32%,#fffdeb 67%,#e1fff5 100%);overflow:visible}
+.portal-backdrop[hidden],.case-study-open .portal-backdrop{display:none!important}
+.portal-backdrop .portal-stage--about{opacity:0}
+.portal-backdrop.is-about .portal-stage--hero{opacity:0}
+.portal-backdrop.is-about .portal-stage--about{opacity:1}
+.portal-redesign main{z-index:1}
+.portal-redesign .portal-hero{background:transparent!important;isolation:auto}
+.portal-redesign .portal-hero:after{display:none}
+.portal-redesign .hero-highlights{border-width:3px}
+.portal-redesign .hero-highlights:before{inset:-3px;padding:3px;background:var(--portal-outline)}
+@media(min-width:1101px){
+ .portal-redesign .portal-resume .resume-card--identity{border:0;background:transparent}
+ .portal-resume .about-content-rail:after{content:"";position:absolute;inset:0;z-index:30;border-radius:inherit;padding:3px;background:var(--portal-outline);pointer-events:none;-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+}
+@media(max-width:1100px){
+ .portal-redesign .compact-about{background:transparent}
+ .portal-redesign .compact-about__stage{position:relative}
+ .portal-redesign .compact-about__stage:after{content:"";position:absolute;inset:0;z-index:30;border-radius:inherit;padding:3px;background:var(--portal-outline);pointer-events:none;-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+}
+
+/* Scroll-driven arrow: lower, finer and using the frame gradient. */
+.portal-redesign .portal-down{top:907px;width:45px;height:44px;display:flex;align-items:center;justify-content:center;transform:scale(var(--arrow-scale,1));transform-origin:center;will-change:transform}
+.portal-down-icon{display:block;flex:none;overflow:visible}
+.portal-down:focus-visible{outline:2px solid #ffaa00;outline-offset:8px;border-radius:8px}
+.portal-backdrop .portal-stage--hero,.portal-backdrop .portal-stage--about{will-change:opacity}
+@media(max-width:650px){.portal-redesign .portal-down{top:788px}}
+@media(prefers-reduced-motion:reduce){.portal-redesign .portal-down{transform:none;will-change:auto}}
+
+/* Three depth ranges: portals, masked creatives and smaller decorations. */
+.portal-group{position:absolute;max-width:none;pointer-events:none;will-change:translate}
+.portal-base,.portal-creative{display:block;width:100%;height:auto;max-width:none;pointer-events:none}
+.portal-creative-mask{position:absolute;inset:0;mask-repeat:no-repeat;mask-position:center;mask-size:100% 100%;-webkit-mask-repeat:no-repeat;-webkit-mask-position:center;-webkit-mask-size:100% 100%;pointer-events:none}
+.portal-creative{will-change:translate}
+@media(prefers-reduced-motion:reduce){.portal-group,.portal-creative,.portal-asset{translate:none!important;will-change:auto}}
+
+/* Exported creatives already contain transparency; no file-URL mask is needed. */
+.portal-creative-mask{overflow:hidden;translate:none;rotate:none;transform:none;mask-mode:alpha}
+.portal-base{position:relative;z-index:0}
+.portal-creative-mask{z-index:1}
+.portal-creative{position:relative;opacity:1;visibility:visible;will-change:translate,rotate}
+@media(prefers-reduced-motion:reduce){.portal-group,.portal-creative,.portal-asset{rotate:none!important}}
+
+/* Abstract portfolio markers; desktop row or single vertical column. */
+.portal-redesign .hero-highlights li{position:relative;padding-left:32px}
+.portal-redesign .hero-highlights li:before,.case-highlights li:before{content:"";display:block;position:absolute;width:17px;height:17px;background:linear-gradient(145deg,#ffb755,#ff8875);border-radius:45% 70% 40% 65%;transform:rotate(-16deg);pointer-events:none}
+.portal-redesign .hero-highlights li:before{left:0;top:6px}
+.case-highlights li{position:relative;padding-left:54px}
+.case-highlights li:before{left:24px;top:29px}
+.portal-redesign .hero-highlights li:nth-child(2):before,.case-highlights li:nth-child(2):before{border-radius:35% 65% 35% 65%;background:linear-gradient(135deg,#ffe287,#ffa989);transform:rotate(30deg)}
+.portal-redesign .hero-highlights li:nth-child(3):before,.case-highlights li:nth-child(3):before{width:14px;height:20px;border-radius:75% 30% 75% 35%;background:linear-gradient(145deg,#b3f4d7,#70d7c8);transform:rotate(22deg)}
+.portal-redesign .hero-highlights li:nth-child(4):before{border-radius:30% 70% 65% 35%;background:linear-gradient(145deg,#ffe89c,#a9ecce);transform:rotate(-25deg)}
+.portal-redesign .portal-hero{height:var(--usp-hero-height,980px)!important}
+.portal-redesign .portal-down{top:var(--usp-arrow-top,907px)}
+@media(max-width:1100px){.portal-redesign .hero-highlights{grid-template-columns:minmax(0,1fr);gap:26px;padding:28px}.portal-redesign .hero-highlights span{max-width:none}}
+@media(max-width:900px){.case-highlights{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:650px){.portal-redesign .portal-hero{height:var(--usp-hero-height,830px)!important}.portal-redesign .hero-highlights{gap:24px;padding:24px 22px}.portal-redesign .hero-highlights li{padding-left:30px}.portal-redesign .hero-highlights li:before{top:3px}.portal-redesign .portal-down{top:var(--usp-arrow-top,788px)}}
+
+/* Slightly smaller, lighter abstract markers. */
+.portal-redesign .hero-highlights li:before,.case-highlights li:before{width:14px;height:14px;opacity:.65}
+.portal-redesign .hero-highlights li:nth-child(3):before,.case-highlights li:nth-child(3):before{width:12px;height:16px}
+
+/* Marker palette follows coral → amber → lime → turquoise. */
+.portal-redesign .hero-highlights li:nth-child(1):before,.case-highlights li:nth-child(1):before{background:linear-gradient(145deg,#ff8875,#ffb755)}
+.portal-redesign .hero-highlights li:nth-child(2):before,.case-highlights li:nth-child(2):before{background:linear-gradient(145deg,#ffb755,#ffe287)}
+.portal-redesign .hero-highlights li:nth-child(3):before,.case-highlights li:nth-child(3):before{background:linear-gradient(145deg,#ffe89c,#a9ecce)}
+.portal-redesign .hero-highlights li:nth-child(4):before,.case-highlights li:nth-child(4):before{background:linear-gradient(145deg,#b3f4d7,#70d7c8)}
+
+/* About photo: two synchronized clips reproduce Figma node 17:252. */
+.figma-portrait-composition{position:absolute;width:286px;height:586px;transform:scale(var(--photo-scale,1));transform-origin:top left;pointer-events:none}
+.figma-portrait-base{position:absolute;left:118px;top:0;width:168px;height:586px;overflow:hidden;border-radius:40px;background:radial-gradient(ellipse at 94% 92%,#ff9a52 0%,#ffc38e 45%,#ffedca 77%,#fff7ca 100%)}
+.figma-portrait-overhang{position:absolute;left:54px;top:7px;width:232px;height:384px;overflow:hidden}
+.figma-portrait-composition img{position:absolute!important;top:14.277px!important;width:363.081px!important;height:581.997px!important;max-width:none!important;object-fit:cover!important;transform:rotate(-10.02deg)!important;transform-origin:center!important;clip-path:none!important;margin:0!important;border-radius:0!important}
+.figma-portrait-base img{left:-63.578px!important}
+.figma-portrait-overhang img{left:.422px!important;top:7.277px!important}
+@media(min-width:1101px){.portal-resume .resume-portrait-group .figma-portrait-composition{--photo-scale:.81569966;left:-96.25256px;top:36px}}
+/* Compact About retains its original fluid frame and portrait layout. */
+@media(max-width:1100px){
+ #about-panel-0 .compact-about__portrait-frame{background:radial-gradient(ellipse at 94% 92%,#ff9a52 0%,#ffc38e 45%,#ffedca 77%,#fff7ca 100%)}
+ #about-panel-0 .compact-about__portrait-frame .compact-about__portrait{clip-path:none}
+}
+
+/* Full-resolution RGB source with the approved transparent photo mask. */
+.figma-portrait-composition img,#about-panel-0 .compact-about__portrait-frame .compact-about__portrait{mask-image:var(--about-photo-mask);-webkit-mask-image:var(--about-photo-mask);mask-size:100% 100%;-webkit-mask-size:100% 100%;mask-repeat:no-repeat;-webkit-mask-repeat:no-repeat}
+@media(min-width:1101px){
+ .figma-portrait-composition img{width:326.773px!important;height:523.797px!important;top:68px!important}
+ .figma-portrait-base img{left:-63px!important}
+ .figma-portrait-overhang{left:88px;width:198px;mask-image:none;-webkit-mask-image:none}
+ .figma-portrait-overhang img{left:-33px!important;top:61px!important}
+}
+@media(max-width:1100px){
+ #about-panel-0 .compact-about__portrait-frame{overflow:hidden;clip-path:inset(0 round 22px)!important}
+ #about-panel-0 .compact-about__portrait-frame .compact-about__portrait{width:calc(var(--portrait-width,280px) * .92)}
+}
+@media(max-width:600px){
+ #about-panel-0 .compact-about__portrait-frame{clip-path:inset(0 round 14px)!important}
+ #about-panel-0 .compact-about__portrait-frame .compact-about__portrait{width:clamp(322px,calc(46vw + 152px),405px)}
+}
+
+
+/* Keep the lower silhouette inside the rounded base; only hair can project. */
+@media(max-width:1100px){
+ #about-panel-0 .compact-about__portrait-frame{overflow:visible;clip-path:none!important}
+ .compact-about__photo-base{position:absolute;inset:0;overflow:hidden;border-radius:inherit}
+ .compact-about__photo-hair{position:absolute;left:calc(-1 * var(--photo-overhang,20px));right:0;top:-12px;height:calc(72% + 12px);overflow:hidden;pointer-events:none;z-index:2;clip-path:none;mask-image:none;-webkit-mask-image:none}
+}
+
+
+/* A smaller, more tilted photo; the projecting copy includes no sleeve fade. */
+@media(min-width:1101px){
+ .portal-resume .resume-portrait-group .figma-portrait-composition{--photo-scale:.73412969;left:-86.6273px}
+ .figma-portrait-composition img{transform:rotate(-16.20675deg)!important;top:80px!important}
+ .figma-portrait-overhang img{top:73px!important;clip-path:inset(0 0 50% 0)!important}
+}
+@media(max-width:1100px){
+ #about-panel-0 .compact-about__portrait-frame .compact-about__portrait{width:calc(var(--portrait-width,280px) * .82);transform:translateX(-42%) rotate(-16.20675deg)}
+ #about-panel-0 .compact-about__portrait-frame .compact-about__photo-hair .compact-about__portrait{clip-path:inset(0 0 50% 0)}
+}
+@media(max-width:600px){
+ #about-panel-0 .compact-about__portrait-frame .compact-about__portrait{width:clamp(290px,calc(41.4vw + 137px),365px);transform:translateX(-50%) rotate(-16.20675deg)}
+}
+
+/* One photo layer avoids the visible splice between the upper and lower masks. */
+.figma-portrait-silhouette{position:absolute;inset:0;overflow:visible;clip-path:path("M 54 -60 H 286 V 546 Q 286 586 246 586 H 158 Q 118 586 118 546 V 390 C 118 350 54 350 54 320 Z")}
+@media(min-width:1101px){
+ .figma-portrait-silhouette img{left:80.2px!important;top:80px!important}
+ .portal-resume .resume-portrait-group{overflow:visible}
+}
+@media(max-width:1100px){
+ .compact-about__photo-silhouette{position:absolute;inset:0;overflow:visible;pointer-events:none}
+ #about-panel-0 .compact-about__portrait-frame .compact-about__portrait{left:57%;clip-path:none}
+}
+@media(max-width:600px){
+ #about-panel-0 .compact-about__portrait-frame .compact-about__portrait{left:calc(50% + clamp(0px,calc(90px - 15vw),35px))}
+}
+
+
+
+/* In the stacked About layout, use half the previous photo-panel height. */
+@media(max-width:600px){
+ #about-panel-0 .compact-about__portrait-frame{height:clamp(170px,calc(32.5vw + 50px),225px)}
+ #about-panel-0 .compact-about__portrait-frame .compact-about__portrait{top:-45px}
+}
+
+/* Desktop portrait: identical 36px backing insets in the 550px About card. */
+@media(min-width:1101px){
+ .portal-resume .resume-card--identity .resume-portrait-group{left:36px;top:0}
+ .portal-resume .resume-portrait-group .figma-portrait-composition{--photo-scale:.8156996587;left:-96.252559727px;top:36px}
+ .figma-portrait-silhouette img{width:360px!important;height:577.059px!important;left:60px!important;top:18px!important}
+}

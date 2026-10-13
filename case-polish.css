@@ -1,0 +1,25 @@
+html[lang="ru"] p,html[lang="ru"] h1,html[lang="ru"] h2,html[lang="ru"] h3,html[lang="ru"] li{word-break:normal;hyphens:manual;text-wrap:pretty}
+.case-highlights{margin:32px 0 44px;gap:22px}
+.case-highlights li{padding:26px 24px;border-radius:20px}
+.case-highlights strong{line-height:1.4}
+.case-highlights span{margin-top:12px;line-height:1.6}
+#credit-products-case .case-highlights li{background:#fff8f2;border-color:#f6e9df}
+#real-estate-case .case-highlights li{background:#fffdf0;border-color:#f3edcf}
+#special-insurance .case-highlights li{background:#f5fcf7;border-color:#e4f2e9}
+#special-china .case-highlights li{background:#fff7f3;border-color:#f5e5de}
+#special-junior .case-highlights li{background:#fffdf0;border-color:#f3edcf}
+.case-study--special .junior-before-after,.case-study--special .junior-before-layer{background:#ebedef}
+.case-study--special .junior-after-layer{background:linear-gradient(160deg,#fff16a 0%,#fff7d6 65%,#faf5e8 100%)}
+
+/* Keep outgoing frames visible during the overlap; preload incoming media. */
+.case-motion .case-motion__video{transition:opacity .65s ease,visibility 0s linear .65s;opacity:0;visibility:hidden}
+.case-motion .case-motion__video.is-active{opacity:1;visibility:visible;transition:opacity .65s ease,visibility 0s}
+.case-study--special .junior-process__stage img{transition:opacity .65s ease!important}
+.case-study--special .junior-process.is-scrubbing .junior-process__stage img{transition:none!important}
+.case-study--special .insurance-visual .variant-hold{z-index:3;opacity:1;pointer-events:none;transition:opacity .65s ease!important}
+@media(prefers-reduced-motion:reduce){.case-motion .case-motion__video,.case-study--special .junior-process__stage img,.case-study--special .insurance-visual .variant-hold{transition:none!important}}
+
+@media(max-width:700px){.case-highlights{gap:14px;margin:28px 0 36px}.case-highlights li{padding:22px 24px}.case-highlights span{margin-top:10px}}
+
+.case-highlights li{padding-left:54px}
+@media(max-width:700px){.case-highlights li{padding-left:54px}}

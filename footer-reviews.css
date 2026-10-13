@@ -1,0 +1,66 @@
+/* Review cards share the translucent fill and outline with Hero USP cards. */
+@media(min-width:1101px){.portal-redesign .resume-desktop.about-gallery{height:300svh}}
+.portal-redesign .footer-contact{position:relative;isolation:isolate;min-height:1100px;padding-top:100px;padding-bottom:72px;overflow:visible;clip-path:none;background:transparent}
+.portal-redesign .footer-contact:before{z-index:0;inset:0 auto 0 50%;width:100vw;transform:translateX(-50%);background:radial-gradient(ellipse 88% 132% at 10.5% 28%,#fff 0%,#fff9f4 32%,#fffdeb 67%,#e1fff5 100%);filter:none}
+.portal-redesign .footer-contact:after{z-index:0;pointer-events:none;box-shadow:inset 0 72px 64px 12px #fff,inset 0 -64px 58px rgba(255,255,255,.72)}
+.portal-redesign .footer-contact .footer-portals{position:absolute;z-index:0;top:0;bottom:0;left:50%;width:100vw;transform:translateX(-50%);overflow:hidden;pointer-events:none}
+.footer-portals img{position:absolute;display:block;height:auto;max-width:none;opacity:.6}
+.footer-contact>.footer-reviews,.footer-contact>.eyebrow,.footer-contact>h2,.footer-contact>.contact__links{position:relative;z-index:1}
+.footer-reviews{margin:0 calc(-1 * var(--gutter,72px)) 112px}
+.footer-contact .footer-reviews__heading{font-size:clamp(24px,2.5vw,36px);line-height:1.2;font-weight:600;margin:0 0 40px;padding:0 var(--gutter,72px)}
+.footer-reviews__row{overflow-x:auto;overflow-y:hidden;scrollbar-width:none;overscroll-behavior-x:contain;touch-action:pan-x pan-y;scroll-snap-type:x proximity;padding:12px 0 20px;outline-offset:-4px}
+.footer-reviews__row::-webkit-scrollbar{display:none}
+.footer-reviews__row+.footer-reviews__row{margin-top:12px}
+.footer-reviews__track{display:flex;width:max-content;gap:28px;padding:0 48px}
+.footer-review-card{position:relative;flex:0 0 clamp(340px,37vw,530px);width:clamp(340px,37vw,530px);min-height:230px;padding:30px 32px;border:3px solid transparent;border-radius:28px;background:rgba(255,255,255,.75);background-clip:padding-box;backdrop-filter:none;-webkit-backdrop-filter:none;scroll-snap-align:center;filter:none;opacity:1;transition:filter .18s ease;box-sizing:border-box}
+.footer-review-card:before{content:"";position:absolute;inset:-3px;border-radius:inherit;padding:3px;background:var(--portal-outline);pointer-events:none;-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+.footer-review-card blockquote{margin:0;display:flex;flex-direction:column;height:100%;gap:24px}
+.footer-review-card blockquote p{font-size:19px;line-height:1.45;font-weight:500;margin:0}
+.footer-review-card cite{display:block;font-size:14px;line-height:1.45;font-style:normal;color:#737373;margin-top:auto}
+.footer-review-card:focus-visible{outline:2px dotted #737373;outline-offset:6px}
+.footer-contact>.eyebrow{margin-top:0}
+.portal-redesign .footer-contact>h2{margin-top:56px}
+.portal-redesign .footer-contact>.contact__links{margin-top:110px}
+@media(max-width:1100px){.portal-redesign .footer-contact{margin-top:0;padding-top:64px;min-height:1000px}.footer-reviews{margin-left:calc(-1 * var(--gutter));margin-right:calc(-1 * var(--gutter));margin-bottom:80px}.footer-reviews__track{gap:20px;padding:0 28px}.footer-review-card{min-height:230px;padding:26px 28px}.footer-contact .footer-reviews__heading{margin-bottom:28px}.footer-portals img{opacity:.5}}
+@media(max-width:600px){.portal-redesign .footer-contact{min-height:950px;padding-bottom:56px}.footer-review-card{flex-basis:82vw;width:82vw;min-height:250px;padding:24px;border-radius:24px}.footer-review-card blockquote p{font-size:17px}.footer-reviews__track{gap:18px;padding:0 22px}.footer-reviews{margin-bottom:72px}.portal-redesign .footer-contact>h2{font-size:clamp(32px,9vw,46px);margin-top:40px}.portal-redesign .footer-contact>.contact__links{margin-top:72px;gap:24px}}
+@media(prefers-reduced-motion:reduce){.footer-review-card{transition:none}.footer-reviews__row{scroll-behavior:auto}}
+
+/* Match the Contacts label and let the two rows extend beyond the content grid. */
+.footer-contact .footer-reviews__heading{font-family:Inter,Arial,sans-serif;font-size:13px;line-height:normal;font-weight:500;letter-spacing:.01em;text-transform:uppercase;color:var(--muted)}
+.footer-reviews{width:100vw;left:50%;transform:translateX(-50%);margin-left:0!important;margin-right:0!important}
+.footer-reviews__row{overflow:visible;scroll-snap-type:none;touch-action:pan-y;cursor:grab}
+.footer-reviews__row.is-dragging{cursor:grabbing;user-select:none}
+.footer-reviews__track{position:relative;will-change:transform}
+.footer-review-card{font-family:Inter,Arial,sans-serif;mix-blend-mode:normal;backdrop-filter:none;-webkit-backdrop-filter:none;opacity:1;box-shadow:none}
+.footer-review-card blockquote p{font-weight:400}
+.footer-reviews__row+.footer-reviews__row{margin-top:16px}
+@media(min-width:1101px){.about-composition .resume-nav{height:clamp(300px,48svh,414px)}}
+
+/* Heading uses the same content width and gutter as Contacts. */
+.footer-contact .footer-reviews__heading{width:min(100%,1440px);margin-left:auto;margin-right:auto;padding-left:var(--gutter);padding-right:var(--gutter)}
+/* A clear middle and progressively softer edges, independent of card position. */
+.footer-reviews__row{position:relative}
+/* Give the blur enough sampling space and feather it vertically as well as sideways. */
+.footer-reviews__edge-blur{position:absolute;inset:-64px 0;z-index:3;pointer-events:none}
+.footer-reviews__blur-layer{position:absolute;inset:0;background:transparent;pointer-events:none;
+ --vertical-mask:linear-gradient(180deg,transparent 0%,#000 64px,#000 calc(100% - 64px),transparent 100%);
+ -webkit-mask-image:var(--edge-mask),var(--vertical-mask);mask-image:var(--edge-mask),var(--vertical-mask);
+ -webkit-mask-composite:source-in;mask-composite:intersect;
+ -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-size:100% 100%;mask-size:100% 100%;mask-mode:alpha}
+.footer-reviews__blur-layer--1{backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);--edge-mask:linear-gradient(90deg,#000 0%,transparent 28%,transparent 72%,#000 100%)}
+.footer-reviews__blur-layer--2{backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);--edge-mask:linear-gradient(90deg,#000 0%,transparent 22%,transparent 78%,#000 100%)}
+.footer-reviews__blur-layer--3{backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);--edge-mask:linear-gradient(90deg,#000 0%,transparent 16%,transparent 84%,#000 100%)}
+.footer-reviews__blur-layer--4{backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);--edge-mask:linear-gradient(90deg,#000 0%,transparent 10%,transparent 90%,#000 100%)}
+/* Keep the translucent USP fill stable when it crosses the viewport edge. */
+.portal-redesign .hero-highlights{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;filter:none!important;opacity:1!important;background-color:rgba(255,255,255,.75)}
+
+/* Review ribbons are read-only; mouse clicks never paint focus boxes or carets. */
+.footer-reviews__row,.footer-reviews__row *{caret-color:transparent;user-select:none;-webkit-user-select:none}
+.footer-reviews__row:focus,.footer-review-card:focus,.footer-review-card:focus-visible{outline:none;box-shadow:none}
+.footer-reviews__track{padding-left:0;padding-right:0}
+
+.footer-contact .footer-reviews__heading{margin-bottom:12px}
+.footer-reviews__note{width:min(100%,1440px);margin:0 auto 28px;padding:0 var(--gutter);font-size:12px;line-height:1.5;color:var(--muted)}
+
+/* Keep the section heading above the rows' feathered blur overlays. */
+.footer-contact .footer-reviews__heading{position:relative;z-index:5}

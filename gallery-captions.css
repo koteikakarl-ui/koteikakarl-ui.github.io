@@ -1,0 +1,6 @@
+/* Product labels stay inside the existing gallery mask without changing geometry. */
+.case-study .gallery-methods{margin:24px 0 0;max-width:800px;font-size:clamp(15px,1.35vw,18px);line-height:1.55;color:#666}
+.case-gallery.scroll-gallery .case-gallery__caption{position:absolute;z-index:3;left:18px;bottom:18px;max-width:calc(100% - 36px);padding:8px 12px;border-radius:10px;background:rgba(255,255,255,.94);color:#333;font-size:14px;font-weight:400;line-height:1.35;text-align:left;pointer-events:none;opacity:0;transition:opacity .28s ease}
+.case-gallery.scroll-gallery .case-gallery__item.is-scroll-active .case-gallery__caption{opacity:1}
+@media(max-width:700px){.case-gallery.scroll-gallery .case-gallery__caption{left:12px;bottom:12px;max-width:calc(100% - 24px);padding:7px 10px;font-size:12px}}
+@media(prefers-reduced-motion:reduce){.case-gallery.scroll-gallery .case-gallery__caption{opacity:1;transition:none}}
