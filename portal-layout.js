@@ -6,18 +6,14 @@
  if(!original)return;
  const backdrop=document.createElement('div');backdrop.className='portal-backdrop';backdrop.setAttribute('aria-hidden','true');
  const heroLayer=original.querySelector('.portal-stage');heroLayer.classList.add('portal-stage--hero');
- const aboutLayer=heroLayer.cloneNode(true);aboutLayer.classList.replace('portal-stage--hero','portal-stage--about');
- aboutLayer.querySelectorAll('img').forEach(image=>{
-  if(image.src.includes('16-222')){image.remove();return;}
-  image.src=image.getAttribute('src').replace('full-hero-','full-about-').replace(/\?v=.*/,'?v=portals-6');
- });
  // The creative is a separate layer, clipped by the same soft portal mask.
  const dimensions={'14-114':[614,1230],'14-115':[486,1004],'14-116':[755,1169]};
  const portalDepth={'14-114':.64,'14-115':.84,'14-116':.72};
  const decorationDepth={'16-189':.85,'16-187':.58,'16-188':.72};
  const parallaxItems=[];
- [heroLayer,aboutLayer].forEach(layer=>layer.querySelectorAll(':scope > img').forEach(image=>{
+ [heroLayer].forEach(layer=>layer.querySelectorAll(':scope > img').forEach(image=>{
   const id=image.getAttribute('src').match(/(\d+-\d+)\.png/)?.[1];
+  if(id==='16-222')image.classList.add('portal-hero-glow');
   if(dimensions[id]){
    const group=document.createElement('div');group.className='portal-group';group.style.cssText=image.style.cssText;
    group.style.aspectRatio=dimensions[id].join(' / ');
@@ -36,7 +32,7 @@
    parallaxItems.push({node:group,depth:portalDepth[id],range:62});
   }else if(decorationDepth[id]){parallaxItems.push({node:image,depth:decorationDepth[id],range:92});}
  }));
- backdrop.append(heroLayer,aboutLayer);document.body.prepend(backdrop);original.remove();
+ backdrop.append(heroLayer);document.body.prepend(backdrop);original.remove();
  const portrait=resume?.querySelector('.resume-card--identity .resume-portrait-group');
  if(portrait)portrait.innerHTML='<div class="figma-portrait-composition"><div class="figma-portrait-base"></div><div class="figma-portrait-silhouette"><img src="assets/portals/about-portrait-current.png?v=about-photo-3" alt="Портрет Даши"></div></div>';
  const compactFrame=document.querySelector('#about-panel-0 .compact-about__portrait-frame');
@@ -92,8 +88,13 @@
   if(currentFade===null){currentFade=fadeTarget;currentScale=scaleTarget;}
   currentFade+=(fadeTarget-currentFade)*follow;
   currentScale+=(scaleTarget-currentScale)*follow;
-  heroLayer.style.opacity=String(1-currentFade);
-  aboutLayer.style.opacity=String(currentFade);
+  // Portals are persistent; only the creative inside each matching mask fades.
+  heroLayer.style.opacity='1';
+  heroLayer.querySelectorAll('.portal-creative-mask,.portal-hero-glow').forEach(mask=>mask.style.opacity=String(1-currentFade));
+  heroLayer.querySelectorAll('.portal-base,.portal-asset:not(.portal-hero-glow)').forEach(base=>{
+   base.style.opacity='1';
+   base.style.filter='brightness('+(1+.06*currentFade).toFixed(3)+') saturate('+(1-.1*currentFade).toFixed(3)+')';
+  });
   arrow?.style.setProperty('--arrow-scale',String(currentScale));
   backdrop.style.clipPath='inset(0 0 '+Math.max(0,innerHeight-bottom)+'px 0)';
   const heroVisible=hero.getBoundingClientRect().bottom>0;
@@ -135,8 +136,8 @@
    node.style.rotate=(item.tilt+Math.sin(idleClock*.22+item.phase)*.35*weight).toFixed(3)+'deg';
    // Tilt the whole portal group, so its base and image mask remain one plane.
    const hasDepth=item.hero&&!isCreative;
-   const rx=hasDepth?((enabled?-localY*proximity*2.75:0)+Math.sin(idleClock*.19+item.phase)*.45*weight):0;
-   const ry=hasDepth?((enabled?localX*proximity*3.5:0)+Math.cos(idleClock*.17+item.phase)*.6*weight):0;
+   const rx=hasDepth?((enabled?-localY*proximity*2.75*(1-currentFade):0)+Math.sin(idleClock*.19+item.phase)*.45*weight):0;
+   const ry=hasDepth?((enabled?localX*proximity*3.5*(1-currentFade):0)+Math.cos(idleClock*.17+item.phase)*.6*weight):0;
    item.rx+=(rx-item.rx)*easing;item.ry+=(ry-item.ry)*easing;
    node.style.transform=hasDepth&&!reduced.matches?'perspective(1100px) rotateX('+item.rx.toFixed(3)+'deg) rotateY('+item.ry.toFixed(3)+'deg)':'none';
    if(Math.abs(rx-item.rx)>.003||Math.abs(ry-item.ry)>.003)parallaxMoving=true;
