@@ -58,7 +58,7 @@
  const count=toolButtons.length;
  for(let cycle=0;cycle<7;cycle++)toolButtons.forEach((source,i)=>{
   const b=el('button');b.type='button';b.setAttribute('aria-label',source.dataset.tool);
-  b.append(source.querySelector('img').cloneNode(true));b.addEventListener('click',()=>showTool(i));belt.append(b);
+  const icon=source.querySelector('img').cloneNode(true);icon.draggable=false;b.append(icon);b.addEventListener('click',()=>showTool(i));belt.append(b);
  });
  const renderBelt=(animate=true)=>{
   if(!animate)[...belt.children].forEach(b=>b.style.transition='none');
@@ -100,11 +100,14 @@
  const swipe=(surface,move)=>{let start;surface.addEventListener('touchstart',e=>{if(e.target.closest('.compact-about__tool-slider'))return;const t=e.touches[0];start={x:t.clientX,y:t.clientY}},{passive:true});surface.addEventListener('touchend',e=>{if(!start)return;const t=e.changedTouches[0],dx=t.clientX-start.x,dy=t.clientY-start.y;if(Math.abs(dx)>48&&Math.abs(dx)>Math.abs(dy)*1.5){e.stopPropagation();move(dx<0?1:-1)}start=null},{passive:true})};
  // Drag the icon belt directly; preserve vertical page scrolling.
  let drag=null,suppressClick=false;
- tools.addEventListener('pointerdown',e=>{if(e.button!==0)return;clearTimeout(settleTimer);rebaseBelt();drag={id:e.pointerId,x:e.clientX,y:e.clientY,dx:0,horizontal:false};});
- tools.addEventListener('pointermove',e=>{if(!drag)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(!drag.horizontal&&Math.abs(dx)>8&&Math.abs(dx)>Math.abs(dy)){drag.horizontal=true;tools.setPointerCapture(e.pointerId)}if(!drag.horizontal)return;drag.dx=dx;belt.style.transition='none';belt.style.transform='translateX('+(-physical*76+dx)+'px)';
+ tools.addEventListener('dragstart',e=>e.preventDefault());
+ tools.addEventListener('pointerdown',e=>{if(e.button!==0||drag)return;if(e.pointerType==='mouse')e.preventDefault();clearTimeout(settleTimer);rebaseBelt();const scale=icons.getBoundingClientRect().width/icons.offsetWidth||1;drag={id:e.pointerId,x:e.clientX,y:e.clientY,scale,dx:0,horizontal:false};});
+ tools.addEventListener('pointermove',e=>{if(!drag||drag.id!==e.pointerId)return;const dx=(e.clientX-drag.x)/drag.scale,dy=(e.clientY-drag.y)/drag.scale;if(!drag.horizontal&&Math.abs(dx)>8&&Math.abs(dx)>Math.abs(dy)){drag.horizontal=true;tools.setPointerCapture(e.pointerId)}if(!drag.horizontal)return;e.preventDefault();drag.dx=dx;belt.style.transition='none';belt.style.transform='translateX('+(-physical*76+dx)+'px)';
  [...belt.children].forEach((b,j)=>{const d=Math.abs(j-physical+dx/76);b.style.transition='none';b.style.filter='blur('+Math.min(5,d*1.35)+'px)';b.style.opacity=String(Math.max(.18,1-d*.22));b.style.transform='scale('+Math.max(.66,1-d*.12)+')'})});
- const finishDrag=e=>{if(!drag)return;const d=drag;drag=null;if(d.horizontal){suppressClick=true;setTimeout(()=>suppressClick=false,0);const steps=Math.max(-3,Math.min(3,Math.round(-d.dx/76)));showTool(toolIndex+steps)}};
- tools.addEventListener('pointerup',finishDrag);tools.addEventListener('pointercancel',()=>{drag=null;renderBelt()});
+ const finishDrag=e=>{if(!drag||drag.id!==e.pointerId)return;const d=drag;drag=null;if(tools.hasPointerCapture(e.pointerId))tools.releasePointerCapture(e.pointerId);if(d.horizontal){suppressClick=true;setTimeout(()=>suppressClick=false,0);const steps=Math.max(-3,Math.min(3,Math.round(-d.dx/76)));showTool(toolIndex+steps)}};
+ window.addEventListener('pointerup',finishDrag);
+ const cancelDrag=()=>{if(!drag)return;drag=null;renderBelt();settleTimer=setTimeout(rebaseBelt,680)};
+ tools.addEventListener('pointercancel',cancelDrag);tools.addEventListener('lostpointercapture',cancelDrag);
  icons.addEventListener('click',e=>{if(suppressClick){e.preventDefault();e.stopImmediatePropagation()}},true);
 
  let active=0;

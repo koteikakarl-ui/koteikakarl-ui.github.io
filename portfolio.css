@@ -2123,6 +2123,13 @@ html body [data-before-after]:focus-within{outline:none!important}
 @media(max-width:1100px){.hero-highlights{grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;padding:24px;bottom:24px}.hero__name-art{bottom:280px!important}}
 @media(max-width:600px){.hero{height:auto!important;min-height:100svh!important;padding-bottom:24px}.hero__parallax-layer{position:relative!important;min-height:430px;padding-top:110px!important}.hero__name-art{bottom:36px!important}.hero-highlights{position:relative;left:auto;right:auto;bottom:auto;margin:0 var(--gutter);padding:20px 18px;gap:22px 14px;border-radius:22px}.hero-highlights li{padding-left:16px}.hero-highlights strong{font-size:16px}.hero-highlights span{font-size:13px}.hero__role{max-width:100%}}
 
+/* Tool ribbons are draggable controls, never selectable image content. */
+.practice-tool-column,.practice-tool-column *,.compact-about__tool-slider,.compact-about__tool-slider *{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.practice-tool-column img,.compact-about__tool-slider img{-webkit-user-drag:none;pointer-events:none}
+.practice-tool-column,.compact-about__icons{cursor:grab}
+.practice-tool-column:active,.compact-about__icons:active{cursor:grabbing}
+.compact-about__tool-slider{touch-action:pan-y}
+
 /* language.css */
 .hero .nav{justify-content:space-between;align-items:center}
 .language-switch{display:flex;align-items:center;gap:6px;flex-shrink:0;font:inherit;line-height:1}

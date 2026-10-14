@@ -19,6 +19,7 @@
  });const deadlines=states.filter(s=>s.active).map(s=>s.nextAt);if(deadlines.length&&!document.hidden)timer=setTimeout(tick,Math.max(16,Math.min(...deadlines)-now));};
  states.forEach(s=>{s.root.addEventListener('pointerdown',()=>{s.held=true;wake()},{passive:true});['pointerup','pointercancel','lostpointercapture'].forEach(type=>s.root.addEventListener(type,()=>{s.held=false;wake()},{passive:true}))});
  states.forEach(s=>['click','wheel','pointerdown','pointerup','keydown'].forEach(type=>s.root.addEventListener(type,()=>{s.nextAt=performance.now()+3000;wake()},{passive:true})));
+ ['pointerup','pointercancel'].forEach(type=>addEventListener(type,()=>{states.forEach(s=>{if(s.held){s.held=false;s.nextAt=performance.now()+3000}});wake()},{passive:true}));
  addEventListener('scroll',wake,{passive:true});addEventListener('resize',wake,{passive:true});
  document.addEventListener('visibilitychange',()=>{states.forEach(s=>s.active=false);tick()});
  new MutationObserver(wake).observe(document.body,{subtree:true,attributes:true,attributeFilter:['class','hidden','inert']});
