@@ -4,6 +4,8 @@
  const interval=4000;
  const videoInterval=6000;
  const groups=[];
+ let timer=0,queued=0;
+ const wake=()=>{if(!queued)queued=requestAnimationFrame(()=>{queued=0;refresh()})};
  const add=(root,buttons,delay=interval)=>{if(buttons.length<2)return null;const group={root,buttons,interval:delay,nextAt:0,manualUntil:0,visible:false,autoClick:false};groups.push(group);return group;};
  document.querySelectorAll('.case-motion').forEach(root=>add(root,[...root.querySelectorAll('.case-motion__controls button')],videoInterval));
  document.querySelectorAll('[data-insurance-slider]').forEach(root=>add(root,[...root.querySelectorAll('[data-slide]')]));
@@ -13,7 +15,7 @@
   const range=root.querySelector('input[type="range"]');if(range)groups.push({root,range,interval,nextAt:0,manualUntil:0,visible:false,phase:0});
  });
  groups.forEach(group=>{
-  const pause=()=>{group.manualUntil=performance.now()+group.interval;};
+  const pause=()=>{group.manualUntil=performance.now()+group.interval;wake();};
   group.root.addEventListener('pointerdown',()=>{group.dragging=true;group.animation=0;pause();},{passive:true});
   const release=()=>{if(!group.dragging)return;group.dragging=false;pause();};
   window.addEventListener('pointerup',release,{passive:true});window.addEventListener('pointercancel',release,{passive:true});
@@ -60,14 +62,14 @@
    image.decode().then(()=>{if(token!==version)return;currentHold.style.opacity='0';setTimeout(()=>{currentHold.remove();if(hold===currentHold)hold=null;},700);}).catch(()=>{});
   }).observe(image,{attributes:true,attributeFilter:['src']});
  });
- document.querySelectorAll('.case-motion__video').forEach(video=>{video.preload='auto';});
+
  const refresh=()=>{
-  const now=performance.now();
+  clearTimeout(timer);const now=performance.now();
   groups.forEach(group=>{
    const usable=!document.hidden&&isVisible(group.root);
    const paused=group.dragging||now<group.manualUntil;
    if(!usable){group.visible=false;group.nextAt=0;return;}
-   if(paused){group.nextAt=Math.max(group.nextAt,group.manualUntil);return;}
+   if(paused){group.visible=true;group.nextAt=Math.max(group.nextAt,group.manualUntil);return;}
    if(!group.visible){group.root.querySelectorAll('img').forEach(image=>image.loading='eager');group.visible=true;group.nextAt=now+group.interval;group.phase=now;return;}
    if(now<group.nextAt||group.switching)return;
    group.nextAt=now+group.interval;
@@ -91,7 +93,7 @@
      group.autoInput=true;group.processRange.value=String(group.buttons[index].dataset.stage);group.processRange.dispatchEvent(new Event('input',{bubbles:true}));group.autoInput=false;
     }else{group.autoClick=true;group.buttons[index].click();group.autoClick=false;}
     group.nextAt=performance.now()+group.interval;
-   }).catch(()=>{}).finally(()=>{group.switching=false;});
+   }).catch(()=>{}).finally(()=>{group.switching=false;wake();});
   });
   videos.forEach(video=>{
    const owner=video.closest('.case-study');
@@ -103,9 +105,13 @@
     playRequests.add(video);video.play().catch(()=>{}).finally(()=>playRequests.delete(video));
    }
   });
+  const deadlines=groups.filter(g=>g.visible&&!g.dragging&&!g.switching).map(g=>Math.max(g.nextAt,g.manualUntil));
+  if(!document.hidden&&deadlines.length)timer=setTimeout(refresh,Math.max(16,Math.min(...deadlines)-performance.now()));
  };
  // Timers stop advancing hidden/off-screen groups and restart after manual inspection.
- setInterval(refresh,100);
+ addEventListener('scroll',wake,{passive:true});addEventListener('resize',wake,{passive:true});
+ const observer=new IntersectionObserver(wake);groups.forEach(g=>observer.observe(g.root));videos.forEach(v=>{observer.observe(v);v.addEventListener('loadeddata',wake)});
+ new MutationObserver(wake).observe(document.body,{subtree:true,attributes:true,attributeFilter:['class','hidden']});
  document.addEventListener('visibilitychange',refresh);
  reduced.addEventListener('change',refresh);
  refresh();

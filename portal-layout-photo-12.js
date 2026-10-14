@@ -12,7 +12,7 @@
  const decorationDepth={'16-189':.85,'16-187':.58,'16-188':.72};
  const parallaxItems=[];
  [heroLayer].forEach(layer=>layer.querySelectorAll(':scope > img').forEach(image=>{
-  const id=image.getAttribute('src').match(/(\d+-\d+)\.png/)?.[1];
+  const id=image.getAttribute('src').match(/(\d+-\d+)(?:-lossless)?\.(?:png|webp)/)?.[1];
   if(id==='16-222')image.classList.add('portal-hero-glow');
   if(dimensions[id]){
    const group=document.createElement('div');group.className='portal-group';group.style.cssText=image.style.cssText;
@@ -21,12 +21,12 @@
    image.style.cssText='';image.className='portal-base';
    const isHero=layer===heroLayer;
    if(isHero){
-    const baseSrc='assets/portals/parallax-base-'+id+'.png?v=portals-9';image.src=baseSrc;
+    const baseSrc='assets/portals/parallax-base-'+id+'-lossless.webp?v=performance-1';image.src=baseSrc;
     const mask=document.createElement('div');mask.className='portal-creative-mask';const alpha=window.portalMasks?.[id];
     if(alpha){mask.style.maskImage='url("'+alpha+'")';mask.style.webkitMaskImage='url("'+alpha+'")';}
     // Mask belongs to the portal group and has no independent animation.
 
-    const creative=document.createElement('img');creative.className='portal-creative';creative.alt='';creative.src='assets/portals/parallax-image-'+id+'.png?v=portals-9';
+    const creative=document.createElement('img');creative.className='portal-creative';creative.alt='';creative.src='assets/portals/parallax-image-'+id+'-lossless.webp?v=performance-1';
     mask.append(creative);group.append(mask);parallaxItems.push({node:creative,depth:1.05,range:14});
    }
    parallaxItems.push({node:group,depth:portalDepth[id],range:62});
@@ -34,7 +34,7 @@
  }));
  backdrop.append(heroLayer);document.body.prepend(backdrop);original.remove();
  const portrait=resume?.querySelector('.resume-card--identity .resume-portrait-group');
- if(portrait)portrait.innerHTML='<div class="figma-portrait-composition"><div class="figma-portrait-base"></div><div class="figma-portrait-silhouette"><img src="assets/portals/about-portrait-current.png?v=about-photo-3" alt="Портрет Даши"></div></div>';
+ if(portrait)portrait.innerHTML='<div class="figma-portrait-composition"><div class="figma-portrait-base"></div><div class="figma-portrait-silhouette"><img src="assets/portals/about-portrait-current-lossless.webp?v=about-photo-3" alt="Портрет Даши"></div></div>';
  const compactFrame=document.querySelector('#about-panel-0 .compact-about__portrait-frame');
  if(compactFrame){
   const photo=compactFrame.querySelector('.compact-about__portrait');
@@ -63,7 +63,13 @@
  const smooth=value=>value*value*(3-2*value);
  const finePointer=matchMedia('(hover:hover) and (pointer:fine)');
  const pointer={x:0,y:0,tx:0,ty:0,clientX:0,clientY:0,engaged:false};
- parallaxItems.forEach((item,index)=>{item.x=0;item.y=0;item.tilt=0;item.rx=0;item.ry=0;item.phase=index*1.37;item.period=17+(index%5)*2.3;item.hero=item.node.closest('.portal-stage--hero')===heroLayer;});
+ parallaxItems.forEach((item,index)=>{item.x=0;item.y=0;item.tilt=0;item.rx=0;item.ry=0;item.phase=index*1.37;item.period=17+(index%5)*2.3;item.anchor=item.node.closest('.portal-group')||item.node;item.isCreative=item.node.classList.contains('portal-creative');item.isGroup=item.node.classList.contains('portal-group');item.hero=item.node.closest('.portal-stage--hero')===heroLayer;});
+ const masks=[...heroLayer.querySelectorAll('.portal-creative-mask,.portal-hero-glow')];
+ const bases=[...heroLayer.querySelectorAll('.portal-base,.portal-asset:not(.portal-hero-glow)')];
+ const work=document.querySelector('#work'),compactAbout=document.querySelector('#about-mobile');
+ let geometryDirty=true;
+ const setStyle=(node,key,value)=>{if(node.style[key]!==value)node.style[key]=value};
+ heroLayer.style.opacity='1';bases.forEach(base=>base.style.opacity='1');
  // Different slow ellipses combine upward, lateral and inward movement.
  const idleMotion=(seconds,phase,period,amplitude)=>({
   x:amplitude*(Math.sin(seconds*2*Math.PI/period+phase)*.72+Math.sin(seconds*2*Math.PI/(period*1.6)+phase*.7)*.28),
@@ -73,14 +79,15 @@
  let pending=0,lastTime=0,currentFade=null,currentScale=null;
  const update=now=>{
   pending=0;
-  const about=document.querySelector(matchMedia('(min-width:1101px)').matches?'#resume':'#about-mobile');
-  const work=document.querySelector('#work');
+  const about=matchMedia('(min-width:1101px)').matches?resume:compactAbout;
   const bottom=work?.getBoundingClientRect().top??0;
   backdrop.hidden=bottom<=0;
+  const heroBox=hero.getBoundingClientRect();
+  if(geometryDirty){parallaxItems.forEach(item=>{const a=item.anchor;item.centerX=a.offsetLeft+a.offsetWidth/2;item.centerY=a.offsetTop+a.offsetHeight/2});geometryDirty=false;}
   const aboutTop=about?.getBoundingClientRect().top??innerHeight;
   const fadeTarget=smooth(clamp((innerHeight*.95-aboutTop)/(innerHeight*.75)));
   // A reciprocal quadratic curve has a rounded peak and long, gentle tails.
-  const arrowCenter=hero.getBoundingClientRect().top+(arrow?.offsetTop??0)+(arrow?.offsetHeight??0)/2;
+  const arrowCenter=heroBox.top+(arrow?.offsetTop??0)+(arrow?.offsetHeight??0)/2;
   const distance=(arrowCenter-innerHeight*.62)/(innerHeight*.34);
   const scaleTarget=reduced.matches?1:.9+.42/(1+3*distance*distance);
   const dt=lastTime?Math.min(Math.max(now-lastTime,0),64):16;
@@ -90,14 +97,14 @@
   currentScale+=(scaleTarget-currentScale)*follow;
   // Portals are persistent; only the creative inside each matching mask fades.
   heroLayer.style.opacity='1';
-  heroLayer.querySelectorAll('.portal-creative-mask,.portal-hero-glow').forEach(mask=>mask.style.opacity=String(1-currentFade));
-  heroLayer.querySelectorAll('.portal-base,.portal-asset:not(.portal-hero-glow)').forEach(base=>{
+  masks.forEach(mask=>setStyle(mask,'opacity',String(1-currentFade)));
+  bases.forEach(base=>{
    base.style.opacity='1';
-   base.style.filter='brightness('+(1+.06*currentFade).toFixed(3)+') saturate('+(1-.1*currentFade).toFixed(3)+')';
+   setStyle(base,'filter','brightness('+(1+.06*currentFade).toFixed(3)+') saturate('+(1-.1*currentFade).toFixed(3)+')');
   });
   arrow?.style.setProperty('--arrow-scale',String(currentScale));
   backdrop.style.clipPath='inset(0 0 '+Math.max(0,innerHeight-bottom)+'px 0)';
-  const heroVisible=hero.getBoundingClientRect().bottom>0;
+  const heroVisible=heroBox.bottom>0;
   const idleActive=!reduced.matches&&!document.hidden&&!backdrop.hidden&&!document.body.classList.contains('case-study-open')&&heroVisible&&currentFade<.995;
   if(idleActive)idleClock+=dt/1000;
   const idleTarget=idleActive?1:0;
@@ -110,28 +117,28 @@
   const sceneScale=Math.max(.5,Math.min(1.35,innerWidth/1440));
   parallaxItems.forEach(item=>{
    const {node,depth,range}=item;
-   const anchor=node.closest('.portal-group')||node;
+
    // Resting coordinates avoid feedback from an element's animated transform.
-   const centerX=innerWidth/2+(anchor.offsetLeft+anchor.offsetWidth/2-720)*sceneScale;
-   const centerY=(anchor.offsetTop+anchor.offsetHeight/2)*sceneScale;
+   const centerX=innerWidth/2+(item.centerX-720)*sceneScale;
+   const centerY=(item.centerY)*sceneScale;
    const dx=pointer.clientX-centerX,dy=pointer.clientY-centerY;
    const reach=Math.max(420,innerWidth*.55);
    const proximity=1/(1+(dx*dx+dy*dy)/(reach*reach));
    const localX=Math.max(-1,Math.min(1,dx/(innerWidth*.35)));
    const localY=Math.max(-1,Math.min(1,dy/(innerHeight*.5)));
    const enabled=active&&pointer.engaged;
-   const isCreative=node.classList.contains('portal-creative');
+   const isCreative=item.isCreative;
    const motionSign=isCreative?-1:1;
    const motionStrength=.75*.8*1.25*(isCreative?1.5625:1);
    const tx=enabled?(pointer.tx*.6+localX*proximity*.7)*range*depth*motionStrength*motionSign:0;
    const ty=enabled?(pointer.ty*.5+localY*proximity*.65)*range*depth*.7*motionStrength*motionSign:0;
-   const tilt=enabled?localX*proximity*(node.classList.contains('portal-creative')?.55:1.15)*depth*motionStrength*motionSign:0;
+   const tilt=enabled?localX*proximity*(isCreative?.55:1.15)*depth*motionStrength*motionSign:0;
    const returnTime=1250;
-   const followTime=enabled?(node.classList.contains('portal-creative')?280:380):returnTime;
+   const followTime=enabled?(isCreative?280:380):returnTime;
    const easing=reduced.matches?1:1-Math.exp(-dt/followTime);
    item.x+=(tx-item.x)*easing;item.y+=(ty-item.y)*easing;item.tilt+=(tilt-item.tilt)*easing;
    const weight=item.hero?idleWeight*(1-currentFade):0;
-   const drift=idleMotion(idleClock,item.phase,item.period,isCreative?2.2:node.classList.contains('portal-group')?9:11);
+   const drift=idleMotion(idleClock,item.phase,item.period,isCreative?2.2:item.isGroup?9:11);
    node.style.translate=(item.x+drift.x*weight).toFixed(3)+'px '+(item.y+drift.y*weight).toFixed(3)+'px';
    node.style.rotate=(item.tilt+Math.sin(idleClock*.22+item.phase)*.35*weight).toFixed(3)+'deg';
    // Tilt the whole portal group, so its base and image mask remain one plane.
@@ -159,7 +166,9 @@
  window.addEventListener('blur',resetPointer);
  finePointer.addEventListener('change',resetPointer);
  document.addEventListener('visibilitychange',()=>{lastTime=0;if(document.hidden)resetPointer();else queue()});
- const resize=()=>{document.body.style.setProperty('--portal-scale',String(Math.max(.5,Math.min(1.35,window.innerWidth/1440))));queue()};
+ const resize=()=>{geometryDirty=true;document.body.style.setProperty('--portal-scale',String(Math.max(.5,Math.min(1.35,window.innerWidth/1440))));queue()};
  window.addEventListener('scroll',queue,{passive:true});window.addEventListener('resize',resize,{passive:true});
+ new ResizeObserver(()=>{geometryDirty=true;queue()}).observe(heroLayer);
+ heroLayer.addEventListener('load',()=>{geometryDirty=true;queue()},true);
  resize();
 })();

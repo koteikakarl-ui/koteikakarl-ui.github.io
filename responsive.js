@@ -15,7 +15,7 @@
  navShell.append(nav);compact.append(sentinel,navShell,stage);resume.before(compact);
  new IntersectionObserver(([entry])=>navShell.classList.toggle('is-stuck',!entry.isIntersecting&&entry.boundingClientRect.top<0),{threshold:0}).observe(sentinel);
  const intro=el('div','compact-about__intro'),portrait=el('img','compact-about__portrait');
- portrait.src='assets/portals/about-portrait-current.png?v=about-photo-3';portrait.alt='Портрет Даши';portrait.loading='lazy';
+ portrait.src='assets/portals/about-portrait-current-lossless.webp?v=about-photo-3';portrait.alt='Портрет Даши';portrait.loading='lazy';
  const copy=el('div','compact-about__copy');copy.append(el('p','eyebrow',text('.resume-kicker')),el('h2','','Коммуникационный дизайнер'),el('p','',text('.resume-body')));
  const principle=el('div','compact-about__principle');principle.append(el('p','eyebrow','МОЙ ПОДХОД'),el('h3','',text('.resume-principle__copy')));
  const portraitFrame=el('div','compact-about__portrait-frame');portraitFrame.append(portrait);copy.append(principle);intro.append(portraitFrame,copy);panels[0].append(intro);
