@@ -264,7 +264,16 @@ document.querySelectorAll('[data-before-after]').forEach(stage=>{
  let displayed=position,revealFrame=0;
  const render=()=>{
   if(revealFrame)return;
-  const tick=()=>{const target=position+magnet/Math.max(stage.clientWidth,1)*100;displayed=matchMedia('(prefers-reduced-motion:reduce)').matches?target:displayed+(target-displayed)*.24;stage.style.setProperty('--reveal',`${displayed}%`);if(Math.abs(target-displayed)>.015)revealFrame=requestAnimationFrame(tick);else{stage.style.setProperty('--reveal',`${target}%`);revealFrame=0}};
+  let previous=0;
+  const tick=time=>{
+   const target=position+magnet/Math.max(stage.clientWidth,1)*100;
+   const dt=previous?Math.min(time-previous,64):16;previous=time;
+   const ease=matchMedia('(prefers-reduced-motion:reduce)').matches?1:1-Math.exp(-dt/140);
+   displayed+=(target-displayed)*ease;
+   stage.style.setProperty('--reveal',`${displayed}%`);
+   if(Math.abs(target-displayed)>.015)revealFrame=requestAnimationFrame(tick);
+   else{stage.style.setProperty('--reveal',`${target}%`);revealFrame=0}
+  };
   revealFrame=requestAnimationFrame(tick);
  };
  const updatePosition=clientX=>{

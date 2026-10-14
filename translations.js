@@ -1,4 +1,14 @@
 window.portfolioTranslations = {
+  "Подбираю технику под задачу: собственное 3D или сочетание 3D и нейросетевой доработки. Например, летние креативы Platinum выполнены в комбинированной технике. Все работы использовались на веб-страницах Т-Банка, в том числе в сезонных кампаниях.": "I choose the technique for each brief: my own 3D work or a combination of 3D and AI refinement. For example, the summer Platinum creatives use a mixed technique. All of these works appeared on T-Bank web pages, including seasonal campaigns.",
+  "Нужно было уйти от пластиковых 3D-объектов к более живой подаче, ориентированной на людей. Я предложила сцены со знакомыми домашними предметами: они связывали ипотечный продукт с реальным жильём и повседневной жизнью. Впоследствии A/B-тестирование показало значительный рост конверсии обновлённой страницы. Подробности и численные результаты защищены NDA.": "The brief was to move from plastic-looking 3D objects to a more lifelike, people-focused approach. I proposed scenes with familiar household objects to connect mortgage products with real homes and everyday life. Subsequent A/B testing showed a substantial increase in conversion on the updated page. Details and numerical results are covered by an NDA.",
+
+  "Кредитные продукты и участие в A/B-тестированиях": "Credit products and participation in A/B testing",
+  "Участие в A/B-тестированиях": "Participation in A/B testing",
+  "Вместе с продуктовой командой": "Together with the product team",
+  "В кредитной команде участвовала в A/B-тестированиях совместно с продуктовой командой. Подробности экспериментов защищены NDA.": "As part of the credit team, I took part in A/B testing together with the product team. Experiment details are covered by an NDA.",
+  "· Структура и дизайн страниц, сборка в конструкторе, 3D и анимация. Над структурой и текстами работала вместе с редактором. Участвовала в A/B-тестированиях с продуктовой командой.": " · Page structure and design, site-builder implementation, 3D and motion. I worked with an editor on structure and copy, and took part in A/B testing with the product team.",
+  "· Визуальное направление, 3D и анимация. Вместе с редактором перестроила блоки разводящей страницы и полностью обновила её графику. Участвовала в A/B-тестированиях с продуктовой командой.": " · Visual direction, 3D and motion. I worked with an editor to restructure the mortgage hub page and completely refresh its graphics, and took part in A/B testing with the product team.",
+
   "После редизайна ↗": "After redesign ↗",
   "До редизайна · архив ↗": "Before redesign · archive ↗",
 

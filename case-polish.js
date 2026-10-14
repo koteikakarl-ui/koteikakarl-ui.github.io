@@ -78,7 +78,7 @@
     const token=group.animation=(group.animation||0)+1;
     const frame=now=>{
      if(group.animation!==token||group.dragging||document.hidden||!isVisible(group.root))return;
-     const t=reduced.matches?1:Math.min(1,(now-start)/650),ease=t*t*(3-2*t);
+     const t=reduced.matches?1:Math.min(1,(now-start)/1400),ease=t*t*t*(t*(t*6-15)+10);
      group.autoInput=true;group.range.value=String(from+(to-from)*ease);group.range.dispatchEvent(new Event('input',{bubbles:true}));group.autoInput=false;
      if(t<1)requestAnimationFrame(frame);
     };
