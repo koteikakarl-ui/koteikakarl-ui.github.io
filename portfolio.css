@@ -2130,6 +2130,9 @@ html body [data-before-after]:focus-within{outline:none!important}
 .practice-tool-column:active,.compact-about__icons:active{cursor:grabbing}
 .compact-about__tool-slider{touch-action:pan-y}
 
+/* Only the vertical tool ribbon consumes vertical touch drags. */
+.practice-tool-column,.practice-tool-column *{touch-action:none}
+
 /* language.css */
 .hero .nav{justify-content:space-between;align-items:center}
 .language-switch{display:flex;align-items:center;gap:6px;flex-shrink:0;font:inherit;line-height:1}

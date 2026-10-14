@@ -463,16 +463,17 @@ if(resume){
 let toolDrag=null,toolSuppressClick=false;
 stackButtons.forEach(button=>{const image=button.querySelector('img');if(image)image.draggable=false});
 toolColumn.addEventListener('dragstart',event=>event.preventDefault());
-toolColumn.addEventListener('pointerdown',event=>{
- if(event.button!==0||event.pointerType==='touch'||toolDrag||!matchMedia('(min-width:1101px)').matches)return;
+toolCard.addEventListener('pointerdown',event=>{
+ if(event.button!==0||toolDrag||!matchMedia('(min-width:1101px)').matches)return;
+ const bounds=toolColumn.getBoundingClientRect(),scale=bounds.height/toolColumn.offsetHeight||1;
+ if(event.clientX<bounds.left-48*scale||event.clientX>bounds.right+96*scale||event.clientY<bounds.top-24*scale||event.clientY>bounds.bottom+24*scale)return;
  event.preventDefault();settleLoop();
- const scale=toolColumn.getBoundingClientRect().height/toolColumn.offsetHeight||1;
  toolDrag={id:event.pointerId,y:event.clientY,scale,dy:0,moved:false};
 });
-toolColumn.addEventListener('pointermove',event=>{
+window.addEventListener('pointermove',event=>{
  if(!toolDrag||event.pointerId!==toolDrag.id)return;
  const dy=(event.clientY-toolDrag.y)/toolDrag.scale;
- if(!toolDrag.moved&&Math.abs(dy)>6){toolDrag.moved=true;toolColumn.setPointerCapture(event.pointerId)}
+ if(!toolDrag.moved&&Math.abs(dy)>6){toolDrag.moved=true;toolCard.setPointerCapture(event.pointerId)}
  if(!toolDrag.moved)return;
  event.preventDefault();toolDrag.dy=dy;stack.style.transition='none';
  stack.style.transform=`translateY(${selectedIconTop()-physicalIndex*step+dy}px)`;
@@ -480,15 +481,15 @@ toolColumn.addEventListener('pointermove',event=>{
 const endToolDrag=(event,cancel=false)=>{
  if(!toolDrag||event.pointerId!==toolDrag.id)return;
  const drag=toolDrag;toolDrag=null;
- if(toolColumn.hasPointerCapture(event.pointerId))toolColumn.releasePointerCapture(event.pointerId);
+ if(toolCard.hasPointerCapture(event.pointerId))toolCard.releasePointerCapture(event.pointerId);
  if(!drag.moved)return;
  toolSuppressClick=true;setTimeout(()=>toolSuppressClick=false,0);
  if(!cancel)physicalIndex+=Math.max(-3,Math.min(3,Math.round(-drag.dy/step)));
  wheelLocked=true;renderTools(true);wheelUnlockTimer=setTimeout(settleLoop,720);
 };
 window.addEventListener('pointerup',endToolDrag);
-toolColumn.addEventListener('pointercancel',event=>endToolDrag(event,true));
-toolColumn.addEventListener('lostpointercapture',event=>endToolDrag(event,true));
+toolCard.addEventListener('pointercancel',event=>endToolDrag(event,true));
+toolCard.addEventListener('lostpointercapture',event=>endToolDrag(event,true));
 stack.addEventListener('click',event=>{if(toolSuppressClick){event.preventDefault();event.stopImmediatePropagation()}},true);
 stackButtons.forEach(button=>button.addEventListener('click',()=>{const target=Number(button.dataset.toolIndex),current=logicalIndex(),forward=(target-current+toolCount)%toolCount,backward=forward-toolCount;physicalIndex+=Math.abs(backward)<forward?backward:forward;renderTools(true)}));renderTools(false);addEventListener('resize',()=>renderTools(false),{passive:true})}
 

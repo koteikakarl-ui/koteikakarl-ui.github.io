@@ -720,3 +720,6 @@ html body [data-before-after]:focus-within{outline:none!important}
 .practice-tool-column,.compact-about__icons{cursor:grab}
 .practice-tool-column:active,.compact-about__icons:active{cursor:grabbing}
 .compact-about__tool-slider{touch-action:pan-y}
+
+/* Only the vertical tool ribbon consumes vertical touch drags. */
+.practice-tool-column,.practice-tool-column *{touch-action:none}
