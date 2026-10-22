@@ -3,3 +3,6 @@
  .portal-redesign .compact-about::before{content:none!important;display:none!important;background:none!important}
 }
 .footer-contact .footer-reviews__heading{margin-bottom:28px}
+
+/* Keep the advertising title on one line above the media on wide layouts. */
+@media(min-width:801px){#special-overview .case-advertising-title{display:inline-block;white-space:nowrap}}

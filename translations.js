@@ -1,4 +1,7 @@
 window.portfolioTranslations = {
+  "РЕКЛАМНЫЕ КАМПАНИИ": "ADVERTISING CAMPAIGNS",
+  "Графика для рекламных кампаний и спецпроектов: страхование, переводы в Китай и Junior. Креативы использовались на веб‑страницах и в промоматериалах.": "Graphics for advertising campaigns and special projects: insurance, transfers to China and Junior. The creatives were used on web pages and in promotional materials.",
+
   "Анимации для рекламных кампаний": "Animations for advertising campaigns",
   "Создавала графику и анимацию для рекламных кампаний кредитных продуктов, в том числе для hero-секций веб-страниц. A/B-тест 2025 года показал рост конверсии в полную заявку; результат стал основанием для внедрения анимации в другие продукты. Согласовывала форматы с разработчиками и проверяла воспроизведение после интеграции.": "I created graphics and motion for credit product advertising campaigns, including web page hero sections. A 2025 A/B test showed an increase in conversion to completed applications, supporting the rollout of animation to other products. I coordinated formats with developers and checked playback after integration.",
   "Вторая анимация с мерцающими картами использовалась в рекламной кампании на веб-страницах Т-Банка.": "The second animation, featuring shimmering cards, was used in an advertising campaign on T-Bank web pages.",

@@ -2529,6 +2529,9 @@ a:focus-visible,button:focus-visible{text-decoration:underline;text-underline-of
 }
 .footer-contact .footer-reviews__heading{margin-bottom:28px}
 
+/* Keep the advertising title on one line above the media on wide layouts. */
+@media(min-width:801px){#special-overview .case-advertising-title{display:inline-block;white-space:nowrap}}
+
 /* hero-motion.css */
 /* Entire portals tilt together; their nested masks never get a separate transform. */
 .portal-stage--hero .portal-group,.portal-stage--hero>.portal-asset{transform-origin:center center;will-change:translate,rotate,transform}
