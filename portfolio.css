@@ -2553,12 +2553,12 @@ a:focus-visible,button:focus-visible{text-decoration:underline;text-underline-of
 @media(min-width:1101px) {
   .case--interactive { height:440px }
   #work>.case--interactive>.case__copy { transform:translateX(-25vw) }
-  .case--interactive .case__webgl { transform-origin:center top; transform:translateX(-14%) scale(1.27) }
+  .case--interactive .case__webgl { transform-origin:center top; transform:translate(-12%, -4%) scale(1.27) }
 }
 @media(max-width:1100px) {
   #work>.case--interactive .case__details--edge { order:1; margin-top:16px }
   #work>.case--interactive .case__media { order:2; aspect-ratio:2.1; margin-top:12px; overflow:hidden }
-  .case--interactive .case__webgl { position:absolute; inset:0; transform-origin:center top; transform:translateY(12%) scale(1.65) }
+  .case--interactive .case__webgl { position:absolute; inset:0; transform-origin:center top; transform:scale(1.65) }
 }
 
 @media (701px <= width <= 1100px) {
@@ -2567,11 +2567,13 @@ a:focus-visible,button:focus-visible{text-decoration:underline;text-underline-of
   }
   #work>.case--interactive .case__media {
     position:absolute;
-    inset:auto var(--gutter) 0;
+    inset:8% var(--gutter) 0 max(44%, 270px);
     width:auto;
+    height:auto;
+    aspect-ratio:auto;
     margin:0;
     pointer-events:none;
   }
   #work>.case--interactive .case__details--edge { z-index:5 }
-  #work>.case--interactive .case__webgl { transform:scale(1.65) }
+  #work>.case--interactive .case__webgl { transform:none }
 }
