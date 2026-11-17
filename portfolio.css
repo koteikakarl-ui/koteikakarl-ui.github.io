@@ -2550,32 +2550,12 @@ a:focus-visible,button:focus-visible{text-decoration:underline;text-underline-of
 .case__webgl { display:block; width:100%; height:100%; border:0; pointer-events:none }
 #work>.case--interactive .case__media { mask-image:linear-gradient(to bottom, #000 0%, #000 68%, transparent 100%) }
 .case--interactive .case__details { text-decoration:none }
-@media(min-width:901px) {
-  #work>.case--interactive.case--reverse {
-    display:grid;
-    grid-template-columns:54% 46%;
-    height:440px;
-    padding:0;
-  }
-  #work>.case--interactive.case--reverse>.case__copy {
-    order:2;
-    padding:48px 5vw;
-    translate:none;
-  }
-  #work>.case--interactive .case__copy>.eyebrow { top:20px; margin:0 }
-  #work>.case--interactive .case__copy h2 { margin-top:48px }
-
-  #work>.case--interactive .case__details { align-self:flex-start; margin-top:42px }
-  #work>.case--interactive .case__media {
-    order:1;
-    height:100%;
-    margin:0;
-    overflow:hidden;
-  }
-  #work>.case--interactive .case__webgl {
-    transform:translate(-7%, 12%) scale(1.18);
-  }
+@media(min-width:1101px) {
+  .case--interactive { height:440px }
+  #work>.case--interactive>.case__copy { transform:translateX(-25vw) }
+  .case--interactive .case__webgl { transform:translate(-7%, 12%) scale(1.18) }
 }
-@media(max-width:900px) {
-  .cases>.case--interactive .case__webgl { position:absolute; inset:0 }
+@media(max-width:1100px) {
+  #work>.case--interactive .case__media { aspect-ratio:2.1 }
+  .case--interactive .case__webgl { position:absolute; inset:0 }
 }
