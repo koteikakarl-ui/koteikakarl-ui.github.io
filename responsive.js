@@ -101,13 +101,13 @@
  // Drag the icon belt directly; preserve vertical page scrolling.
  let drag=null,suppressClick=false;
  tools.addEventListener('dragstart',e=>e.preventDefault());
- tools.addEventListener('pointerdown',e=>{if(e.button!==0||drag)return;if(e.pointerType==='mouse')e.preventDefault();clearTimeout(settleTimer);rebaseBelt();const scale=icons.getBoundingClientRect().width/icons.offsetWidth||1;drag={id:e.pointerId,x:e.clientX,y:e.clientY,scale,dx:0,horizontal:false};});
+ tools.addEventListener('pointerdown',e=>{if((e.pointerType==='mouse'&&e.button!==0)||drag)return;if(e.pointerType==='mouse')e.preventDefault();clearTimeout(settleTimer);rebaseBelt();const scale=icons.getBoundingClientRect().width/icons.offsetWidth||1;drag={id:e.pointerId,x:e.clientX,y:e.clientY,scale,dx:0,horizontal:false};tools.setPointerCapture(e.pointerId);});
  tools.addEventListener('pointermove',e=>{if(!drag||drag.id!==e.pointerId)return;const dx=(e.clientX-drag.x)/drag.scale,dy=(e.clientY-drag.y)/drag.scale;if(!drag.horizontal&&Math.abs(dx)>8&&Math.abs(dx)>Math.abs(dy)){drag.horizontal=true;tools.setPointerCapture(e.pointerId)}if(!drag.horizontal)return;e.preventDefault();drag.dx=dx;belt.style.transition='none';belt.style.transform='translateX('+(-physical*76+dx)+'px)';
  [...belt.children].forEach((b,j)=>{const d=Math.abs(j-physical+dx/76);b.style.transition='none';b.style.filter='blur('+Math.min(5,d*1.35)+'px)';b.style.opacity=String(Math.max(.18,1-d*.22));b.style.transform='scale('+Math.max(.66,1-d*.12)+')'})});
  const finishDrag=e=>{if(!drag||drag.id!==e.pointerId)return;const d=drag;drag=null;if(tools.hasPointerCapture(e.pointerId))tools.releasePointerCapture(e.pointerId);if(d.horizontal){suppressClick=true;setTimeout(()=>suppressClick=false,0);const steps=Math.max(-3,Math.min(3,Math.round(-d.dx/76)));showTool(toolIndex+steps)}};
  window.addEventListener('pointerup',finishDrag);
  const cancelDrag=()=>{if(!drag)return;drag=null;renderBelt();settleTimer=setTimeout(rebaseBelt,680)};
- tools.addEventListener('pointercancel',cancelDrag);tools.addEventListener('lostpointercapture',cancelDrag);
+ tools.addEventListener('pointercancel',cancelDrag);tools.addEventListener('lostpointercapture',e=>{if(e.target===tools)cancelDrag()});
  icons.addEventListener('click',e=>{if(suppressClick){e.preventDefault();e.stopImmediatePropagation()}},true);
 
  let active=0;
