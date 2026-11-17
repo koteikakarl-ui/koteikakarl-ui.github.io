@@ -2553,7 +2553,7 @@ a:focus-visible,button:focus-visible{text-decoration:underline;text-underline-of
 @media(min-width:1101px) {
   .case--interactive { height:440px }
   #work>.case--interactive>.case__copy { transform:translateX(-25vw) }
-  .case--interactive .case__webgl { transform:translate(-7%, 12%) scale(1.18) }
+  .case--interactive .case__webgl { transform:translate(-14%, 4%) scale(1.27) }
 }
 @media(max-width:1100px) {
   #work>.case--interactive .case__media { aspect-ratio:2.1 }
