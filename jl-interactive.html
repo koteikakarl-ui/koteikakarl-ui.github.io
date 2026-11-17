@@ -11,9 +11,9 @@ input[type="color"]{height:38px;padding:2px;border:1px solid #c9c4bb;border-radi
 .tab[aria-selected="true"]{background:#fff;color:#29283b;box-shadow:0 1px 3px rgba(41,40,59,.16)}
 .panel[hidden]{display:none}.panel .controls+.row,.panel .row+.controls,.panel .controls+.controls{margin-top:8px}
 @media(max-width:640px){.tabs{border-radius:20px}.tab{padding:8px 13px}}
-.preview body,.preview main{width:100%;height:100vh;margin:0;padding:0}
+.preview body,.preview main{width:100%;height:100vh;margin:0;padding:0;background:transparent}
 .preview main > :not(.stage){display:none}
-.preview .stage{width:100%;height:100%;aspect-ratio:auto;margin:0;border-radius:0}
+.preview .stage{width:100%;height:100%;aspect-ratio:auto;margin:0;border-radius:0;background:transparent}
 </style>
 <main>
 <header><div><div class="eyebrow">Motion study / 14</div><h1>JL Interactive by Bcode</h1><p>Заполненный объём. Контакт. Глубина.</p></div><div class="eyebrow">WebGL · без библиотек</div></header>
@@ -395,7 +395,7 @@ const VIEW_SCALE=[1.34,1.52,1.62]; // camera half-height per volume; the referen
 const DEFAULTS=JSON.parse($('baseSettings').textContent);
 function fail(message){$('error').style.display='block';$('error').textContent=message;}
 window.addEventListener('error',e=>fail('Ошибка: '+e.message));
-const gl=canvas.getContext('webgl',{alpha:false,antialias:false,powerPreference:preview?'low-power':'high-performance'});
+const gl=canvas.getContext('webgl',{alpha:preview,premultipliedAlpha:false,antialias:false,powerPreference:preview?'low-power':'high-performance'});
 if(!gl){fail('WebGL недоступен. Откройте пример в браузере с поддержкой WebGL.');return;}
 
 // ───────── Cached UI state: nothing reads the DOM inside the frame loop ─────────
@@ -408,7 +408,7 @@ function readState(){
  S.glow=Number($('glow').value);S.blur=Number($('depthBlur').value);S.gradientHue=Number($('gradientHue').value)*Math.PI/180;
  S.cursorRadius=Number($('cursorRadius').value);S.penetration=Number($('penetration').value);S.attraction=Number($('attraction').value);
  S.cutaway=$('cutaway').checked;S.fusion=$('fusion').checked;
- S.bg=hex($('background').value);stage.style.background=$('background').value;
+ S.bg=hex($('background').value);stage.style.background=preview?'transparent':$('background').value;
  for(let i=0;i<6;i++)S.colors[i]=hex($('color'+i).value);
  S.cursorLight=Number($('cursorLight').value);
 }
@@ -548,7 +548,7 @@ void main(){
  c=1.-(1.-c)*(1.-clamp(bl*uGlow,0.,1.));
  // dither hides 8-bit banding in the soft gradients
  float n=fract(sin(dot(gl_FragCoord.xy,vec2(12.9898,78.233)))*43758.5453);
- gl_FragColor=vec4(c+(n-.5)/255.,1.);
+ gl_FragColor=vec4(c+(n-.5)/255.,${preview ? "step(.001, sharp.a)" : "1."});
 }`;
 let main,bright,blur,comp,down,dofH,dofQ;
 try{
