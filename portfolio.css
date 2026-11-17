@@ -2553,7 +2553,7 @@ a:focus-visible,button:focus-visible{text-decoration:underline;text-underline-of
   #work>.case--interactive.case--reverse {
     display:grid;
     grid-template-columns:54% 46%;
-    height:520px;
+    height:490px;
     padding:0;
   }
   #work>.case--interactive.case--reverse>.case__copy {
@@ -2563,8 +2563,8 @@ a:focus-visible,button:focus-visible{text-decoration:underline;text-underline-of
   }
   #work>.case--interactive .case__copy>.eyebrow { top:20px; margin:0 }
   #work>.case--interactive .case__copy h2 { margin-top:48px }
-  #work>.case--interactive .case__meta { margin-top:42px }
-  #work>.case--interactive .case__details { align-self:flex-end; margin-top:24px }
+
+  #work>.case--interactive .case__details { align-self:flex-start; margin-top:42px }
   #work>.case--interactive .case__media {
     order:1;
     height:100%;
@@ -2572,7 +2572,7 @@ a:focus-visible,button:focus-visible{text-decoration:underline;text-underline-of
     overflow:hidden;
   }
   #work>.case--interactive .case__webgl {
-    transform:translateX(-9%) scale(1.28);
+    transform:translateX(-7%);
   }
 }
 @media(max-width:900px) {

@@ -127,9 +127,9 @@ function physicsWorkerMain(){
   if(!was||c.shape!==was.shape){world.setShape(c.shape);fusion.group=null;topology++;}
   world.setCount(c.count,c.size,c.softness);
   if(!was||c.count!==was.count)topology++;
-  world.spread=c.spread;world.adhesion=c.adhesion;world.circulation=c.circulation;world.deformationSpeed=c.deformationSpeed;
+  world.maxRadius=c.maxRadius;world.spread=c.spread;world.adhesion=c.adhesion;world.circulation=c.circulation;world.deformationSpeed=c.deformationSpeed;
   if(!was||c.size!==was.size||c.spread!==was.spread){
-   for(const b of world.balls)b.r=c.size*(1+c.spread*b.variation);
+   for(const b of world.balls)b.r=world.radius(c.size,b.variation);
    world.solve(c.softness,12);world.contacts();topology++;
   }
   fusion.mergeSpeed=c.mergeSpeed;fusion.splitSpeed=c.splitSpeed;fusion.neckThickness=c.neckThickness;fusion.maxMembers=c.mergeCount;
@@ -232,6 +232,7 @@ class SoftWorld {
  extent(){return this.R*[1,.874,.806][this.shape];}
  reach(p){const n=Math.hypot(...p);if(n<1e-8)return this.extent();return this.extent()*n/(this.shape===0?n:this.shape===1?Math.max(Math.hypot(p[0],p[2]),Math.abs(p[1])):Math.max(...p.map(Math.abs)));}
  inside(p){const e=this.extent();return this.shape===0?Math.hypot(...p)<=e:this.shape===1?Math.hypot(p[0],p[2])<=e&&Math.abs(p[1])<=e:p.every(x=>Math.abs(x)<=e);}
+ radius(size,variation){return Math.min(size*(1+this.spread*variation),this.maxRadius??Infinity);}
  setShape(shape){if(shape===this.shape)return;const previous=this.balls.map(b=>this.reach(b.p));this.shape=shape;this.balls.forEach((b,i)=>{const scale=this.reach(b.p)/previous[i];b.p=b.p.map(x=>x*scale);b.memory=[];});this.solve(.65,16);this.contacts(1);}
  frontDepth(point,axis){
   const at=t=>point.map((x,k)=>x+t*axis[k]);let outside=2.2*this.R;
@@ -251,7 +252,7 @@ class SoftWorld {
   while(this.balls.length<count){
    let p;do{p=[this.rand()*2-1,this.rand()*2-1,this.rand()*2-1];}while(Math.hypot(...p)>.95);
    const variation=this.rand()*2-1;
-   this.balls.push({p,v:[0,0,0],r:size*(1+this.spread*variation),variation,contacts:new Float32Array(32)});
+   this.balls.push({p,v:[0,0,0],r:this.radius(size,variation),variation,contacts:new Float32Array(32)});
   }
   this.solve(softness,18);this.contacts();
  }
@@ -284,7 +285,7 @@ class SoftWorld {
    }
   }
   this.balls.forEach((b,i)=>{
-   b.r+=(size*(1+this.spread*b.variation)-b.r)*Math.min(1,dt*9);
+   b.r+=(this.radius(size,b.variation)-b.r)*Math.min(1,dt*9);
    const [x,y,z]=b.p;
    // A circulating flow plus individual forcing continuously rearranges neighbours.
    const flow=[.20*z+.11*Math.sin(t*.45+i*2.13+y*2),.11*Math.sin(t*.37+i*1.77+x*2),-.20*x+.11*Math.cos(t*.41+i*1.31+y*2)];
@@ -600,7 +601,7 @@ function allocate(w,h){
 // ───────── Layout, quality, input ─────────
 let cssW=Math.max(1,stage.clientWidth),cssH=Math.max(1,stage.clientHeight);
 new ResizeObserver(es=>{const r=es[0].contentRect;cssW=Math.max(1,r.width);cssH=Math.max(1,r.height);}).observe(stage);
-let scaleCap=preview?1:Math.min(Math.max(devicePixelRatio||1,1.5),2),scale=scaleCap,frameAvg=16.7,frameCount=0;
+let scaleCap=preview?Math.min(1.75,Math.max(1.5,devicePixelRatio||1)):Math.min(Math.max(devicePixelRatio||1,1.5),2),scale=scaleCap,frameAvg=16.7,frameCount=0;
 
 // Rendering owns only a lightweight view of worker snapshots, never a solver.
 let world=Object.assign(Object.create(SoftWorld.prototype),{R:1.22,shape:DEFAULTS.shape,time:0,balls:[]}),fusion=new Fusion(),last=0,yaw=0,pitch=.13,drag=null,autoYaw=0,tiltX=0,tiltY=0,pulse=0;
@@ -611,7 +612,7 @@ let physicsWorker,generation=0,previousSnapshot=null,currentSnapshot=null,receiv
 let currentAttractor={point:[0,0,0],axis:[0,0,1],strength:0,radius:DEFAULTS.cursorRadius,penetration:DEFAULTS.penetration};
 function sendPhysicsInput(force=false){
  const now=performance.now();if(!physicsWorker||(!force&&now-inputStamp<1000/60))return;inputStamp=now;
- physicsWorker.postMessage({type:'input',generation,config:Object.assign({},S.config,{paused:paused||document.hidden||!inView,fusion:S.fusion}),cursor:currentAttractor});
+ physicsWorker.postMessage({type:'input',generation,config:Object.assign({},S.config,{paused:paused||document.hidden||!inView,fusion:S.fusion,maxRadius:preview ? .34 : undefined}),cursor:currentAttractor});
 }
 function receivePhysics({data:s}){
  if(s.generation!==generation){physicsWorker.postMessage({type:'ack',buffer:s.data.buffer},[s.data.buffer]);return;}
@@ -736,7 +737,7 @@ function frame(now){
  if(preview)nextDraw=Math.max(nextDraw+1000/30,now);
  const dt=last?Math.min((now-last)/1000,.05):0;last=now;
  // Adaptive resolution: back off if the GPU cannot hold the display rate, never creep back above a failed level.
- if(dt>0){frameAvg+=(dt*1000-frameAvg)*.05;if(++frameCount%90===0){if(frameAvg>24&&scale>1){scale=Math.max(1,scale*.85);scaleCap=scale;}else if(frameAvg<18.5&&scale<scaleCap)scale=Math.min(scaleCap,scale*1.1);}}
+ if(dt>0){frameAvg+=(dt*1000-frameAvg)*.05;if(++frameCount%90===0){if(frameAvg>(preview?40:24)&&scale>1){scale=Math.max(1,scale*.85);scaleCap=scale;}else if(frameAvg<(preview?35:18.5)&&scale<scaleCap)scale=Math.min(scaleCap,scale*1.1);}}
  const ease=1-Math.exp(-dt*10),slow=1-Math.exp(-dt*3);
  pointer.weight+=((pointer.active&&!drag?1:0)-pointer.weight)*ease;
  pointer.sx+=(pointer.x-pointer.sx)*ease;pointer.sy+=(pointer.y-pointer.sy)*ease;
