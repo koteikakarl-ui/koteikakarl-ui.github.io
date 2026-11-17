@@ -2541,3 +2541,16 @@ a:focus-visible,button:focus-visible{text-decoration:underline;text-underline-of
 .case-publication-links{display:flex;flex-wrap:wrap;gap:12px 28px;margin-top:18px}
 .case-study .case-outcome .case-publication-links a{margin-top:0;text-decoration:underline}
 @media(max-width:700px){.case-publication-links{flex-direction:column;align-items:flex-start;gap:14px}}
+
+/* Compact WebGL project entry */
+.interactive-preview{width:50%;margin-inline:auto;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:center;overflow:hidden;border-radius:16px;background:#f5f0eb}
+.interactive-preview__copy{padding:clamp(20px,3vw,48px)}
+.interactive-preview__copy h2{margin:0;font-size:clamp(24px,3vw,44px);font-weight:500;line-height:1.05}
+.interactive-preview__copy p{margin:14px 0 0}
+.interactive-preview .case__details{margin-top:18px;color:#ac3d13;text-decoration:none}
+.interactive-preview .case__details span{background:none;color:inherit;-webkit-text-fill-color:currentColor}
+.interactive-preview__scene{display:block;width:100%;height:100%;min-height:240px;border:0;pointer-events:none;background:#e6dfcc}
+@media(max-width:800px){
+  .interactive-preview{width:calc(100% - 32px)}
+  .interactive-preview__scene{min-height:180px}
+}
