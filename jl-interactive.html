@@ -11,7 +11,7 @@ input[type="color"]{height:38px;padding:2px;border:1px solid #c9c4bb;border-radi
 .tab[aria-selected="true"]{background:#fff;color:#29283b;box-shadow:0 1px 3px rgba(41,40,59,.16)}
 .panel[hidden]{display:none}.panel .controls+.row,.panel .row+.controls,.panel .controls+.controls{margin-top:8px}
 @media(max-width:640px){.tabs{border-radius:20px}.tab{padding:8px 13px}}
-html.preview{background:transparent!important;color-scheme:light}
+html.preview{background:transparent!important;color-scheme:normal}
 .preview body,.preview main{width:100%;height:100vh;margin:0;padding:0;background:transparent}
 .preview main > :not(.stage){display:none}
 .preview .stage{width:100%;height:100%;aspect-ratio:auto;margin:0;border-radius:0;background:transparent}
@@ -400,7 +400,7 @@ const DEFAULTS=JSON.parse($('baseSettings').textContent);
 function fail(message){$('error').style.display='block';$('error').textContent=message;}
 window.addEventListener('error',e=>fail('Ошибка: '+e.message));
 // WebGL2 gives multisampled render targets (smooth bead edges); WebGL1 remains a fallback.
-const contextOptions={alpha:preview,premultipliedAlpha:false,antialias:false,depth:false,stencil:false,powerPreference:'high-performance'};
+const contextOptions={alpha:preview,premultipliedAlpha:true,antialias:false,depth:false,stencil:false,powerPreference:'high-performance'};
 const gl2=canvas.getContext('webgl2',contextOptions);
 const gl=gl2||canvas.getContext('webgl',contextOptions);
 if(!gl){fail('WebGL недоступен. Откройте пример в браузере с поддержкой WebGL.');return;}
@@ -568,7 +568,7 @@ void main(){
  c=1.-(1.-c)*(1.-clamp(bl*uGlow,0.,1.));
  // dither hides 8-bit banding in the soft gradients
  float n=fract(sin(dot(gl_FragCoord.xy,vec2(12.9898,78.233)))*43758.5453);
- gl_FragColor=vec4(c+(n-.5)/255.,${preview ? "cov" : "1."});
+ gl_FragColor=vec4((c+(n-.5)/255.)*${preview ? "cov" : "1."},${preview ? "cov" : "1."});
 }`;
 let main,bright,blur,comp,down,dofH,dofQ;
 try{
