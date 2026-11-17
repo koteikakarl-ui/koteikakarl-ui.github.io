@@ -7,7 +7,7 @@ if(hero&&gradientCanvas&&nameArt){
  const meshCanvas=document.createElement('canvas');meshCanvas.className='hero__mesh-canvas';meshCanvas.ariaHidden='true';parallaxLayer.insertBefore(meshCanvas,nameArt.nextSibling);
  const m=meshCanvas.getContext('2d'),texture=document.createElement('canvas'),tx=texture.getContext('2d');
  const blurMid=document.createElement('canvas'),blurTop=document.createElement('canvas');blurMid.className='hero__mesh-blur hero__mesh-blur--mid';blurTop.className='hero__mesh-blur hero__mesh-blur--top';blurMid.ariaHidden='true';blurTop.ariaHidden='true';parallaxLayer.insertBefore(blurMid,meshCanvas.nextSibling);parallaxLayer.insertBefore(blurTop,blurMid.nextSibling);const bm=blurMid.getContext('2d'),bt=blurTop.getContext('2d');
- const pointer={x:.5,y:.5,tx:.5,ty:.5,active:0,target:0};let width=1,height=1,dpr=1,ready=false,last=0,animationActive=true,animationFrame=0;
+ const pointer={x:.5,y:.5,tx:.5,ty:.5,active:0,target:0};let meshIdle=false,width=1,height=1,dpr=1,ready=false,last=0,animationActive=true,animationFrame=0;
  const blobs=[
   {x:.05,y:.20,c:[255,253,220],a:.96,rx:.50,ry:.92,p:.2},{x:.40,y:.62,c:[255,245,190],a:.74,rx:.48,ry:.78,p:2.1},
   {x:.76,y:.20,c:[255,100,43],a:.82,rx:.50,ry:.76,p:4.2},{x:.91,y:.77,c:[255,151,59],a:.72,rx:.42,ry:.68,p:5.4},
@@ -17,14 +17,16 @@ if(hero&&gradientCanvas&&nameArt){
   const ar={width:nameArt.offsetWidth,height:nameArt.offsetHeight};if(!ar.width||!ar.height)return;texture.width=Math.ceil(ar.width);texture.height=Math.ceil(ar.height);tx.clearRect(0,0,texture.width,texture.height);tx.filter='brightness(0) invert(1)';
   const letters=[...nameArt.querySelectorAll('.letter')];ready=letters.every(i=>i.complete&&i.naturalWidth);if(!ready)return;
   letters.forEach(img=>{tx.drawImage(img,img.offsetLeft,0,img.offsetWidth,ar.height)});tx.filter='none';tx.globalCompositeOperation='source-in';tx.fillStyle='#fff';tx.fillRect(0,0,texture.width,texture.height);tx.globalCompositeOperation='destination-in';
-  const fade=tx.createLinearGradient(0,0,0,ar.height);fade.addColorStop(0,'rgba(255,255,255,.15)');fade.addColorStop(.28,'rgba(255,255,255,.72)');fade.addColorStop(.58,'rgba(255,255,255,.96)');fade.addColorStop(1,'rgba(255,255,255,1)');tx.fillStyle=fade;tx.fillRect(0,0,ar.width,ar.height);tx.globalCompositeOperation='source-over';nameArt.classList.add('is-mesh-ready');
+  const fade=tx.createLinearGradient(0,0,0,ar.height);fade.addColorStop(0,'rgba(255,255,255,.15)');fade.addColorStop(.28,'rgba(255,255,255,.72)');fade.addColorStop(.58,'rgba(255,255,255,.96)');fade.addColorStop(1,'rgba(255,255,255,1)');tx.fillStyle=fade;tx.fillRect(0,0,ar.width,ar.height);tx.globalCompositeOperation='source-over';nameArt.classList.add('is-mesh-ready');meshIdle=false;
  }
  nameArt.querySelectorAll('.letter').forEach(i=>{if(!i.complete)i.addEventListener('load',buildTexture,{once:true})});
  function resize(){
   const r=hero.getBoundingClientRect();width=Math.max(1,Math.round(r.width));height=Math.max(1,Math.round(r.height));dpr=1;
-  [gradientCanvas,meshCanvas,blurMid,blurTop].forEach(c=>{if(c.width!==width)c.width=width;if(c.height!==height)c.height=height});
+  const lw=Math.max(1,Math.ceil(width/2)),lh=Math.max(1,Math.ceil(height/2));meshIdle=false;
+  // Soft, heavily blurred layers are rendered at half resolution: visually identical, 4x fewer pixels per frame.
+  [[gradientCanvas,lw,lh],[meshCanvas,width,height],[blurMid,lw,lh],[blurTop,lw,lh]].forEach(([c,w,h])=>{if(c.width!==w)c.width=w;if(c.height!==h)c.height=h});
   // Resizing clears the bitmap, even while the animation is paused.
-  if(g)g.setTransform(1,0,0,1,0,0);m.setTransform(1,0,0,1,0,0);bm.setTransform(1,0,0,1,0,0);bt.setTransform(1,0,0,1,0,0);
+  if(g)g.setTransform(lw/width,0,0,lh/height,0,0);m.setTransform(1,0,0,1,0,0);bm.setTransform(1,0,0,1,0,0);bt.setTransform(1,0,0,1,0,0);
   paintGradient(performance.now());buildTexture()
  }
  function glow(x,y,rx,ry,c,a,rot){g.save();g.translate(x,y);g.rotate(rot);g.scale(1,ry/rx);const q=g.createRadialGradient(0,0,rx*.03,0,0,rx);q.addColorStop(0,`rgba(${c},${a})`);q.addColorStop(.38,`rgba(${c},${a*.88})`);q.addColorStop(.7,`rgba(${c},${a*.34})`);q.addColorStop(1,`rgba(${c},0)`);g.fillStyle=q;g.fillRect(-rx,-rx,rx*2,rx*2);g.restore()}
@@ -50,9 +52,9 @@ if(hero&&gradientCanvas&&nameArt){
   const amp=ar.height*3.15*pointer.active,radius=ar.width*.25,points=[];
   for(let y=0;y<=rows;y++){points[y]=[];for(let x=0;x<=cols;x++){const sx=ar.width*x/cols,sy=ar.height*y/rows,env=Math.exp(-Math.pow((sx-px)/radius,2)*1.62),anchor=Math.pow(1-y/rows,.7);const bigNoise=Math.sin(x*.27+t*.00088)*.65+Math.cos(x*.14-y*.38-t*.00056)*.45;const turbulence=Math.pow(anchor,1.45);points[y][x]={x:ox+sx+env*turbulence*bigNoise*8*pointer.active,y:oy+sy-amp*env*anchor*(1+bigNoise*.105*turbulence)}}}
   m.filter='none';
-  for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){const s00={x:texture.width*x/cols,y:texture.height*y/rows},s10={x:texture.width*(x+1)/cols,y:s00.y},s01={x:s00.x,y:texture.height*(y+1)/rows},s11={x:s10.x,y:s01.y};triangle(s00,s10,s11,points[y][x],points[y][x+1],points[y+1][x+1]);triangle(s00,s11,s01,points[y][x],points[y+1][x+1],points[y+1][x])}m.filter='none';bm.clearRect(0,0,width,height);bt.clearRect(0,0,width,height);bm.drawImage(meshCanvas,0,0,width,height);bt.drawImage(meshCanvas,0,0,width,height);
+  for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){const s00={x:texture.width*x/cols,y:texture.height*y/rows},s10={x:texture.width*(x+1)/cols,y:s00.y},s01={x:s00.x,y:texture.height*(y+1)/rows},s11={x:s10.x,y:s01.y};triangle(s00,s10,s11,points[y][x],points[y][x+1],points[y+1][x+1]);triangle(s00,s11,s01,points[y][x],points[y+1][x+1],points[y+1][x])}m.filter='none';bm.clearRect(0,0,blurMid.width,blurMid.height);bt.clearRect(0,0,blurTop.width,blurTop.height);bm.drawImage(meshCanvas,0,0,blurMid.width,blurMid.height);bt.drawImage(meshCanvas,0,0,blurTop.width,blurTop.height);
  }
- function frame(t=0){animationFrame=0;if(!animationActive)return;pointer.x+=(pointer.tx-pointer.x)*.027;pointer.y+=(pointer.ty-pointer.y)*.027;pointer.active+=(pointer.target-pointer.active)*.022;if(t-last>48||!last){paintGradient(t);if(hero.getBoundingClientRect().bottom>0)paintMesh(t);last=t}if(!reduced)animationFrame=requestAnimationFrame(frame)}
+ function frame(t=0){animationFrame=0;if(!animationActive)return;pointer.x+=(pointer.tx-pointer.x)*.027;pointer.y+=(pointer.ty-pointer.y)*.027;pointer.active+=(pointer.target-pointer.active)*.022;if(t-last>48||!last){paintGradient(t);const idle=pointer.target===0&&pointer.active<.002;if(!(idle&&meshIdle)&&hero.getBoundingClientRect().bottom>0){paintMesh(t);meshIdle=idle&&ready}last=t}if(!reduced)animationFrame=requestAnimationFrame(frame)}
  const currentAboutSection=()=>document.querySelector(matchMedia('(min-width:1101px)').matches?'.resume-desktop':'#about-mobile');
  function syncHeroActivity(){const aboutSection=currentAboutSection();const journeyBottom=aboutSection?aboutSection.offsetTop+aboutSection.offsetHeight:hero.offsetHeight,nextActive=document.visibilityState==='visible'&&scrollY<journeyBottom-innerHeight*.2;hero.toggleAttribute('data-animation-paused',!nextActive);if(nextActive===animationActive)return;animationActive=nextActive;if(!animationActive){pointer.target=0;if(animationFrame){cancelAnimationFrame(animationFrame);animationFrame=0}}else{last=0;if(!reduced&&!animationFrame)animationFrame=requestAnimationFrame(frame)}}
  addEventListener('pointermove',e=>{if(!animationActive)return;pointer.tx=Math.min(Math.max(e.clientX/innerWidth,0),1);pointer.ty=Math.min(Math.max(e.clientY/innerHeight,0),1);pointer.target=1},{passive:true});document.addEventListener('pointerleave',()=>{pointer.target=0});addEventListener('scroll',syncHeroActivity,{passive:true});document.addEventListener('visibilitychange',syncHeroActivity);new ResizeObserver(resize).observe(hero);
