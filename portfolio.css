@@ -2578,3 +2578,12 @@ a:focus-visible,button:focus-visible{text-decoration:underline;text-underline-of
   #work>.case--interactive .case__details--edge { z-index:5 }
   #work>.case--interactive .case__webgl { transform:scale(1.12) }
 }
+
+@media (min-width:1101px) {
+  #work>.case .case__meta { margin-top:21px }
+  #work>.case .case__details--edge { top:321px }
+  #work>.case--interactive .case__details--edge { top:259px }
+}
+@media (max-width:1100px) {
+  #work>.case--interactive .case__meta { display:none }
+}
