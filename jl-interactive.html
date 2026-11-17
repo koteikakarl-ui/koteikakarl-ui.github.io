@@ -35,14 +35,14 @@ input[type="color"]{height:38px;padding:2px;border:1px solid #c9c4bb;border-radi
 <label>Область <select id="shape"><option value="0">Сфера</option><option value="1">Цилиндр</option><option value="2">Куб</option></select></label>
 <label>Количество шариков <span id="countValue"></span><input id="count" type="range" min="16" max="160" value="37" step="1"></label>
 <label>Размер бусин <span id="sizeValue"></span><input id="size" type="range" min="0.17" max="0.34" value="0.23" step="0.005"></label>
-<label>Разброс размеров <span id="spreadValue"></span><input id="spread" type="range" min="0" max="0.65" value="0.58" step="0.01"></label>
+<label>Разброс размеров <span id="spreadValue"></span><input id="spread" type="range" min="0" max="0.8" value="0.8" step="0.01"></label>
 </div>
 </section>
 
 <section class="panel" role="tabpanel" id="panel-motion" aria-labelledby="tab-motion" hidden>
 <p class="lead hint">Как шарики течут, сминаются и держатся друг за друга.</p>
 <div class="controls">
-<label>Скорость <span id="speedValue"></span><input id="speed" type="range" min="0" max="2" value="2" step="0.01"></label>
+<label>Скорость <span id="speedValue"></span><input id="speed" type="range" min="0" max="2" value="1" step="0.01"></label>
 <label>Мягкость <span id="softnessValue"></span><input id="softness" type="range" min="0" max="2" value="1" step="0.01"></label>
 <label>Скорость деформации, × <span id="deformationSpeedValue"></span><input id="deformationSpeed" type="range" min="0.1" max="4" step="0.05" value="1"></label>
 <label>Сцепление <span id="adhesionValue"></span><input id="adhesion" type="range" min="0" max="1.5" value="0.25" step="0.05"></label>
@@ -96,7 +96,7 @@ input[type="color"]{height:38px;padding:2px;border:1px solid #c9c4bb;border-radi
 <div class="notes"><div><strong>01 / Геометрия</strong><p>Шарики заполняют выбранный объём: сферу, цилиндр или куб. Их количество меняется ползунком. Поток перемешивает их, а контакты с соседями и стенкой меняют форму.</p></div><div><strong>02 / Материал</strong><p>Цвет шарика зависит только от глубины: центр ближе к камере, поэтому каждый шарик плавно переходит от цвета края к соседнему цвету палитры. Дальние шарики теряют резкость.</p></div><div><strong>03 / Мягкость</strong><p>Широкие мягкие контакты удерживают соседние шарики вместе. После разделения форма восстанавливается постепенно. Скорость деформации управляет появлением и восстановлением вмятин: ниже — медленнее, выше — быстрее. Это приближённая модель, без полной физики мягких тел Houdini.</p></div></div>
 <p class="hint" style="margin-top:24px">Реконструкция по <a href="https://x.com/rickyretouch/status/2116316404622434544" target="_blank" rel="noopener">референсу Ricky Retouch</a>. Браузерное приближение эффекта из Houdini, не копия исходной симуляции.</p>
 </main>
-<script id="baseSettings" type="application/json">{"speed":2,"size":0.23,"hue":0,"glow":0.25,"softness":1,"depth":1,"material":0,"count":37,"attraction":3,"spread":0.58,"adhesion":0.25,"circulation":0.45,"cursorRadius":0.6,"penetration":0.55,"shape":0,"background":"#f5f0eb","depthBlur":2.5,"mergeSpeed":1,"splitSpeed":1,"neckThickness":1,"mergeCount":5,"deformationSpeed":1,"cursorLight":0.35,"gradientHue":0}</script>
+<script id="baseSettings" type="application/json">{"speed":1,"size":0.23,"hue":0,"glow":0.25,"softness":1,"depth":1,"material":0,"count":37,"attraction":3,"spread":0.8,"adhesion":0.25,"circulation":0.45,"cursorRadius":0.6,"penetration":0.55,"shape":0,"background":"#f5f0eb","depthBlur":2.5,"mergeSpeed":1,"splitSpeed":1,"neckThickness":1,"mergeCount":5,"deformationSpeed":1,"cursorLight":0.35,"gradientHue":0}</script>
 <script>
 // Embedded with SoftWorld and Fusion in a Blob: also works from a local file URL.
 function physicsWorkerMain(){
@@ -700,7 +700,7 @@ function updatePause(){$('pause').textContent=paused?'Продолжить':'П�
 $('pause').onclick=()=>{paused=!paused;updatePause();sendPhysicsInput(true);};
 $('reset').onclick=()=>{for(const [id,v] of Object.entries(DEFAULTS))$(id).value=v;generation++;previousSnapshot=null;currentSnapshot=null;fusion=new Fusion();meshGroup=null;meshStamp=-1;yaw=0;pitch=.13;pointer.active=false;pointer.weight=0;currentAttractor.strength=0;$('cutaway').checked=false;$('fusion').checked=true;$('palette').value='ref';applyPalette('ref');updateLabels();sendPhysicsInput(true);};
 // Two compositions from the reference: A uniform beads, B mixed sizes with the palette reversed.
-function variant(v){const set={A:{spread:0,count:80,size:.27,palette:'ref'},B:{spread:.6,count:40,size:.28,palette:'refb'}}[v];for(const k of ['spread','count','size'])$(k).value=set[k];$('palette').value=set.palette;applyPalette(set.palette);updateLabels();sendPhysicsInput(true);}
+function variant(v){const set={A:{spread:0,count:80,size:.27,palette:'ref'},B:{spread:.8,count:40,size:.28,palette:'refb'}}[v];for(const k of ['spread','count','size'])$(k).value=set[k];$('palette').value=set.palette;applyPalette(set.palette);updateLabels();sendPhysicsInput(true);}
 $('variantA').onclick=()=>variant('A');$('variantB').onclick=()=>variant('B');
 function trackPointer(e){
  const rect=stage.getBoundingClientRect(),aspect=rect.width/rect.height,viewScale=VIEW_SCALE[world.shape],halfHeight=aspect<1?viewScale/aspect:viewScale;
@@ -741,7 +741,7 @@ function frame(now){
  pointer.weight+=((pointer.active&&!drag?1:0)-pointer.weight)*ease;
  pointer.sx+=(pointer.x-pointer.sx)*ease;pointer.sy+=(pointer.y-pointer.sy)*ease;
  pulse*=Math.exp(-dt*2.6);
- if(!drag&&!paused)autoYaw+=dt*.035;
+ if(!drag&&!paused)autoYaw+=dt*.0175;
  // The whole volume leans gently toward the cursor.
  tiltX+=(pointer.nx*.16*pointer.weight-tiltX)*slow;tiltY+=(-pointer.ny*.09*pointer.weight-tiltY)*slow;
  const vyaw=yaw+autoYaw+tiltX,vpitch=pitch+tiltY;

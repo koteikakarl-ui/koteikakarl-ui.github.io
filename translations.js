@@ -391,6 +391,7 @@ window.portfolioTranslations = {
   "ДАВАЙТЕ": "LET’S",
   "ОБСУДИМ РАБОТУ": "TALK ABOUT WORK",
   "В РАБОТЕ": "WORK IN PROGRESS",
+  "WebGL, интерактив, Vibe Coding": "WebGL, interactivity, Vibe Coding",
   "СМОТРЕТЬ КЕЙС": "VIEW CASE STUDY",
   "Анимация": "Motion",
   "Развивала визуальную подачу кредитных продуктов: собирала страницы, создавала 3D и анимацию. В автокредитах инициировала обновление структуры вместе с редактором.": "I developed visual communication for credit products, assembling pages and creating 3D and motion. For the car-loan page, I initiated a structural update with an editor.",

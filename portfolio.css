@@ -2542,15 +2542,24 @@ a:focus-visible,button:focus-visible{text-decoration:underline;text-underline-of
 .case-study .case-outcome .case-publication-links a{margin-top:0;text-decoration:underline}
 @media(max-width:700px){.case-publication-links{flex-direction:column;align-items:flex-start;gap:14px}}
 
-/* Compact WebGL project entry */
-.interactive-preview{width:50%;margin-inline:auto;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:center;overflow:hidden;border-radius:16px;background:#f5f0eb}
-.interactive-preview__copy{padding:clamp(20px,3vw,48px)}
-.interactive-preview__copy h2{margin:0;font-size:clamp(24px,3vw,44px);font-weight:500;line-height:1.05}
-.interactive-preview__copy p{margin:14px 0 0}
-.interactive-preview .case__details{margin-top:18px;color:#ac3d13;text-decoration:none}
-.interactive-preview .case__details span{background:none;color:inherit;-webkit-text-fill-color:currentColor}
-.interactive-preview__scene{display:block;width:100%;height:100%;min-height:240px;border:0;pointer-events:none;background:#e6dfcc}
-@media(max-width:800px){
-  .interactive-preview{width:calc(100% - 32px)}
-  .interactive-preview__scene{min-height:180px}
+/* JL Interactive uses the shared case layout and fade. */
+.cases>.case--interactive::before {
+  inset: 41% 2% 12%;
+  background: radial-gradient(ellipse at 78% 30%, #fff 0%, #fff6af 52%, #ffbf72 83%, #ff9a52 100%);
+}
+.cases>.case--interactive .case__media {
+  mix-blend-mode: multiply;
+  mask-image: linear-gradient(to bottom, #000 0%, #000 73%, transparent 100%);
+}
+.case__webgl { display:block; width:100%; height:100%; border:0; pointer-events:none }
+.case--interactive .case__details { text-decoration:none }
+@media(min-width:1101px) {
+  .cases>.case--interactive { grid-template-columns: 54% 46% }
+  #work>.case--interactive.case--reverse>.case__copy { padding-top: 35%; translate: none }
+  .cases>.case--interactive .case__copy h2 { margin-top: 28px }
+  .cases>.case--interactive .case__meta { margin-top: 24px }
+  .cases>.case--interactive .case__details { align-self: flex-end; margin-top: 24px }
+}
+@media(max-width:1100px) {
+  .cases>.case--interactive .case__webgl { position:absolute; inset:0 }
 }
