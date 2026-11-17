@@ -390,6 +390,7 @@ window.portfolioTranslations = {
   "Создала сцены по трём фото за несколько дней. Приёмы передала в гайдах.": "I created scenes from three photos in a few days and shared the techniques in guides.",
   "ДАВАЙТЕ": "LET’S",
   "ОБСУДИМ РАБОТУ": "TALK ABOUT WORK",
+  "В РАБОТЕ": "WORK IN PROGRESS",
   "СМОТРЕТЬ КЕЙС": "VIEW CASE STUDY",
   "Анимация": "Motion",
   "Развивала визуальную подачу кредитных продуктов: собирала страницы, создавала 3D и анимацию. В автокредитах инициировала обновление структуры вместе с редактором.": "I developed visual communication for credit products, assembling pages and creating 3D and motion. For the car-loan page, I initiated a structural update with an editor.",
