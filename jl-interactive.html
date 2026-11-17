@@ -15,6 +15,8 @@ html.preview{background:transparent!important;color-scheme:light}
 .preview body,.preview main{width:100%;height:100vh;margin:0;padding:0;background:transparent}
 .preview main > :not(.stage){display:none}
 .preview .stage{width:100%;height:100%;aspect-ratio:auto;margin:0;border-radius:0;background:transparent}
+#scene{opacity:0;transition:opacity .6s cubic-bezier(.22,.68,.16,1)}#scene.ready{opacity:1}
+@media(prefers-reduced-motion:reduce){#scene{transition:none}}
 </style>
 <main>
 <header><div><div class="eyebrow">Motion study / 14</div><h1>JL Interactive by Bcode</h1><p>Заполненный объём. Контакт. Глубина.</p></div><div class="eyebrow">WebGL · без библиотек</div></header>
@@ -397,8 +399,13 @@ const VIEW_SCALE=[1.34,1.52,1.62]; // camera half-height per volume; the referen
 const DEFAULTS=JSON.parse($('baseSettings').textContent);
 function fail(message){$('error').style.display='block';$('error').textContent=message;}
 window.addEventListener('error',e=>fail('Ошибка: '+e.message));
-const gl=canvas.getContext('webgl',{alpha:preview,premultipliedAlpha:false,antialias:false,powerPreference:preview?'low-power':'high-performance'});
+// WebGL2 gives multisampled render targets (smooth bead edges); WebGL1 remains a fallback.
+const contextOptions={alpha:preview,premultipliedAlpha:false,antialias:false,depth:false,stencil:false,powerPreference:'high-performance'};
+const gl2=canvas.getContext('webgl2',contextOptions);
+const gl=gl2||canvas.getContext('webgl',contextOptions);
 if(!gl){fail('WebGL недоступен. Откройте пример в браузере с поддержкой WebGL.');return;}
+const samples=gl2?Math.min(4,gl.getParameter(gl.MAX_SAMPLES)||0):0;
+const maxSize=Math.min(gl.getParameter(gl.MAX_TEXTURE_SIZE),gl.getParameter(gl.MAX_RENDERBUFFER_SIZE),gl.getParameter(gl.MAX_VIEWPORT_DIMS)[0]);
 
 // ───────── Cached UI state: nothing reads the DOM inside the frame loop ─────────
 const hex=h=>[1,3,5].map(k=>parseInt(h.slice(k,k+2),16)/255);
@@ -492,6 +499,7 @@ vec3 ramp(float t){
 // Rotates the hue of a colour around the grey axis: one control turns the whole gradient.
 vec3 hueRotate(vec3 c,float a){const vec3 k=vec3(.57735);float ca=cos(a);return clamp(c*ca+cross(k,c)*sin(a)+k*dot(k,c)*(1.-ca),0.,1.);}
 void main(){
+ if(uMaterial>3.5){gl_FragColor=vec4(1.);return;} // coverage pass: antialiased silhouette for the transparent preview
  vec3 n=normalize(vNormal);
  float depth=clamp((vPosition.z+1.22)/2.44,0.,1.);
  float outA=mix(1.,.04+.96*depth,uEncodeDepth);   // alpha carries depth for the focus pass
@@ -512,13 +520,19 @@ void main(){
  col=mix(col,vec3(1.),clamp(fall*lam*.4,0.,.5));
  gl_FragColor=vec4(col,outA);
 }`;
-function shader(type,source){const s=gl.createShader(type);gl.shaderSource(s,source);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw Error(gl.getShaderInfoLog(s));return s;}
+// Shaders are compiled once per source (the fullscreen vertex shader is shared) and checked lazily:
+// reading COMPILE_STATUS right away would force each compile to finish before the next one starts.
+const shaderCache=new Map();
+function shader(type,source){const key=type+source;if(!shaderCache.has(key)){const s=gl.createShader(type);gl.shaderSource(s,source);gl.compileShader(s);shaderCache.set(key,s);}return shaderCache.get(key);}
 function makeProgram(vsrc,fsrc,attribs,names){
- const p=gl.createProgram();
- gl.attachShader(p,shader(gl.VERTEX_SHADER,vsrc));gl.attachShader(p,shader(gl.FRAGMENT_SHADER,fsrc));
+ const p=gl.createProgram(),parts=[shader(gl.VERTEX_SHADER,vsrc),shader(gl.FRAGMENT_SHADER,fsrc)];
+ parts.forEach(s=>gl.attachShader(p,s));
  attribs.forEach((a,i)=>gl.bindAttribLocation(p,i,a));
- gl.linkProgram(p);if(!gl.getProgramParameter(p,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(p));
- p.u={};for(const n of names)p.u[n]=gl.getUniformLocation(p,n);return p;
+ gl.linkProgram(p);p.parts=parts;p.names=names;return p;
+}
+function finishProgram(p){
+ if(!gl.getProgramParameter(p,gl.LINK_STATUS))throw Error(p.parts.map(s=>gl.getShaderInfoLog(s)).filter(Boolean).join(' ')||gl.getProgramInfoLog(p));
+ p.u={};for(const n of p.names)p.u[n]=gl.getUniformLocation(p,n);
 }
 const QV='attribute vec2 aQuad;varying vec2 uv;void main(){uv=aQuad*.5+.5;gl_Position=vec4(aQuad,0.,1.);}';
 const brightFs=`precision mediump float;varying vec2 uv;uniform sampler2D uSrc;uniform vec2 uTexel;uniform vec3 uBg;
@@ -540,27 +554,33 @@ float sig(float a){return max(min(uBlur*(1.-smoothstep(.42,.62,a)),${maxSigma.to
 void main(){vec4 center=texture2D(uSource,uv);vec3 color=vec3(0.);float total=0.;
 for(int i=-${N};i<=${N};i++){float d=float(i)*${step.toFixed(2)};vec4 s=texture2D(uSource,uv+uDirection*d);float g=sig(s.a);float w=exp(-d*d/(2.*g*g))/g;color+=s.rgb*w;total+=w;}
 gl_FragColor=vec4(color/max(total,.0001),center.a);}`;
-const compFs=`precision highp float;varying vec2 uv;uniform sampler2D uScene,uSoft,uSoftQ,uB0,uB1,uB2;uniform float uGlow,uDof,uAmount;
+const compFs=`precision highp float;varying vec2 uv;uniform sampler2D uScene,uSoft,uSoftQ,uB0,uB1,uB2,uCov;uniform float uGlow,uDof,uAmount,uCovOn;uniform vec3 uBg;
 void main(){
- vec4 sharp=texture2D(uScene,uv);vec3 c=sharp.rgb;
- if(uDof>.5){float radius=uAmount*(1.-smoothstep(.42,.62,sharp.a));
+ vec4 sharp=texture2D(uScene,uv);vec3 c=sharp.rgb;float depthA=sharp.a;
+ // Multisampled coverage: edge pixels are a mix of bead and the clear colour, so un-mix them
+ // and hand the coverage to the page as alpha (no jagged cut-out silhouette).
+ float cov=uCovOn>.5?texture2D(uCov,uv).r:step(.001,sharp.a);
+ if(uCovOn>.5&&cov>.002){c=clamp((c-(1.-cov)*uBg)/cov,0.,1.);depthA=sharp.a/cov;}
+ if(uDof>.5){float radius=uAmount*(1.-smoothstep(.42,.62,depthA));
   // small radii come from the half-resolution layer, large ones from the quarter-resolution layer
   c=mix(mix(c,texture2D(uSoft,uv).rgb,smoothstep(.3,1.5,radius)),texture2D(uSoftQ,uv).rgb,smoothstep(5.,11.,radius));}
  vec3 bl=texture2D(uB0,uv).rgb*.55+texture2D(uB1,uv).rgb*.85+texture2D(uB2,uv).rgb*1.1;
  c=1.-(1.-c)*(1.-clamp(bl*uGlow,0.,1.));
  // dither hides 8-bit banding in the soft gradients
  float n=fract(sin(dot(gl_FragCoord.xy,vec2(12.9898,78.233)))*43758.5453);
- gl_FragColor=vec4(c+(n-.5)/255.,${preview ? "step(.001, sharp.a)" : "1."});
+ gl_FragColor=vec4(c+(n-.5)/255.,${preview ? "cov" : "1."});
 }`;
 let main,bright,blur,comp,down,dofH,dofQ;
 try{
+ // All programs are queued before any status is read, so the driver can compile them in parallel.
  main=makeProgram(vs,fs,['aPosition','aNormal'],['uCenter','uContacts[0]','uRadius','uBoundary','uAspect','uYaw','uPitch','uShape','uViewScale','uLiquid','uPressure','uActive','uHue','uPaletteHue','uDepth','uMaterial','uLightAmt','uLightRadius','uEncodeDepth','uColor0','uColor1','uColor2','uColor3','uColor4','uColor5','uLightPos']);
  bright=makeProgram(QV,brightFs,['aQuad'],['uSrc','uTexel','uBg']);
  blur=makeProgram(QV,blurFs,['aQuad'],['uSrc','uStep']);
- comp=makeProgram(QV,compFs,['aQuad'],['uScene','uSoft','uSoftQ','uB0','uB1','uB2','uGlow','uDof','uAmount']);
+ comp=makeProgram(QV,compFs,['aQuad'],['uScene','uSoft','uSoftQ','uB0','uB1','uB2','uCov','uGlow','uDof','uAmount','uCovOn','uBg']);
  down=makeProgram(QV,downFs,['aQuad'],['uSrc','uTexel']);
  dofH=makeProgram(QV,dofSource(10,1.4,4.5),['aQuad'],['uSource','uDirection','uBlur']);
  dofQ=makeProgram(QV,dofSource(16,1.5,1000),['aQuad'],['uSource','uDirection','uBlur']);
+ [main,bright,blur,comp,down,dofH,dofQ].forEach(finishProgram);
 }catch(e){fail('Не удалось запустить материал: '+e.message);return;}
 
 // ───────── Geometry ─────────
@@ -591,18 +611,44 @@ function sizeTarget(t,w,h){
  if(gl.checkFramebufferStatus(gl.FRAMEBUFFER)!==gl.FRAMEBUFFER_COMPLETE)throw Error('Недоступен буфер кадра');
  gl.bindFramebuffer(gl.FRAMEBUFFER,null);
 }
-const hA=makeTarget(),hB=makeTarget(),dofA=makeTarget(),dofB=makeTarget(),sceneT=makeTarget(true),A=[makeTarget(),makeTarget(),makeTarget()],B=[makeTarget(),makeTarget(),makeTarget()];
+// WebGL2: the scene is drawn into 4× multisampled renderbuffers and resolved into sceneT,
+// so the beads get true geometric antialiasing before the focus and glow passes.
+function makeMsaa(depth){return{fbo:gl.createFramebuffer(),color:gl.createRenderbuffer(),depth:depth?gl.createRenderbuffer():null,w:1,h:1};}
+function sizeMsaa(t,w,h){
+ t.w=w;t.h=h;
+ gl.bindRenderbuffer(gl.RENDERBUFFER,t.color);gl.renderbufferStorageMultisample(gl.RENDERBUFFER,samples,gl.RGBA8,w,h);
+ gl.bindFramebuffer(gl.FRAMEBUFFER,t.fbo);gl.framebufferRenderbuffer(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.RENDERBUFFER,t.color);
+ if(t.depth){gl.bindRenderbuffer(gl.RENDERBUFFER,t.depth);gl.renderbufferStorageMultisample(gl.RENDERBUFFER,samples,gl.DEPTH_COMPONENT24,w,h);gl.framebufferRenderbuffer(gl.FRAMEBUFFER,gl.DEPTH_ATTACHMENT,gl.RENDERBUFFER,t.depth);}
+ if(gl.checkFramebufferStatus(gl.FRAMEBUFFER)!==gl.FRAMEBUFFER_COMPLETE)throw Error('msaa');
+ gl.bindFramebuffer(gl.FRAMEBUFFER,null);
+}
+let msaa=samples>1?makeMsaa(true):null,msaaCov=samples>1&&preview?makeMsaa(false):null;
+const hA=makeTarget(),hB=makeTarget(),dofA=makeTarget(),dofB=makeTarget(),sceneT=makeTarget(!msaa),covT=makeTarget(),A=[makeTarget(),makeTarget(),makeTarget()],B=[makeTarget(),makeTarget(),makeTarget()];
 function allocate(w,h){
  try{
   sizeTarget(sceneT,w,h);sizeTarget(hA,w/2,h/2);sizeTarget(hB,w/2,h/2);sizeTarget(dofA,w/4,h/4);sizeTarget(dofB,w/4,h/4);
   for(let i=0;i<3;i++){const d=2<<i;sizeTarget(A[i],w/d,h/d);sizeTarget(B[i],w/d,h/d);}
  }catch(e){fail(e.message);}
+ if(msaa)try{sizeMsaa(msaa,w,h);if(msaaCov){sizeTarget(covT,w,h);sizeMsaa(msaaCov,w,h);}}catch(e){
+  // Multisampling unavailable at this size: fall back to the plain single-sample path.
+  msaa=null;msaaCov=null;sceneT.rb=gl.createRenderbuffer();sizeTarget(sceneT,w,h);
+ }
 }
 
 // ───────── Layout, quality, input ─────────
 let cssW=Math.max(1,stage.clientWidth),cssH=Math.max(1,stage.clientHeight);
 new ResizeObserver(es=>{const r=es[0].contentRect;cssW=Math.max(1,r.width);cssH=Math.max(1,r.height);}).observe(stage);
-let scaleCap=preview?Math.min(1.75,Math.max(1.5,devicePixelRatio||1)):Math.min(Math.max(devicePixelRatio||1,1.5),2),scale=scaleCap,frameAvg=16.7,frameCount=0;
+// Render at the real number of device pixels the canvas covers. On the home page the iframe is
+// enlarged with a CSS transform, so its own devicePixelRatio alone would leave the picture upscaled and soft.
+const PIXEL_BUDGET=preview?4.5e6:6e6;
+function targetScale(){
+ let s=devicePixelRatio||1;
+ if(preview&&window.frameElement){try{const f=window.frameElement,r=f.getBoundingClientRect();if(f.offsetWidth>0&&r.width>0)s*=r.width/f.offsetWidth;}catch(e){}}
+ if(!preview)s=Math.max(s,1.5); // light supersampling on 1× screens
+ return Math.max(.5,Math.min(s,Math.sqrt(PIXEL_BUDGET/(cssW*cssH)),maxSize/Math.max(cssW,cssH)));
+}
+// quality: share of the target resolution the GPU sustains; it only backs off, never creeps above a failed level.
+let quality=1,qualityCap=1,scale=targetScale(),frameAvg=16.7,frameCount=0;
 
 // Rendering owns only a lightweight view of worker snapshots, never a solver.
 let world=Object.assign(Object.create(SoftWorld.prototype),{R:1.22,shape:DEFAULTS.shape,time:0,balls:[]}),fusion=new Fusion(),last=0,yaw=0,pitch=.13,drag=null,autoYaw=0,tiltX=0,tiltY=0,pulse=0;
@@ -655,7 +701,7 @@ try{
  physicsWorker.onmessage=receivePhysics;physicsWorker.onerror=()=>{physicsWorker.terminate();physicsWorker=null;fail('Не удалось продолжить расчёт физики. Перезагрузите страницу.');};
 }catch(e){fail('Не удалось запустить отдельный поток физики: '+e.message);return;}
 let inView=!preview||!window.frameElement;
-let frameId=0,nextDraw=0;
+let frameId=0;
 function syncActivity(){
  sendPhysicsInput(true);
  if(inView&&!document.hidden){
@@ -664,7 +710,6 @@ function syncActivity(){
  }
  cancelAnimationFrame(frameId);
  frameId=0;
- nextDraw=0;
  last=0;
 }
 if(preview&&window.frameElement){
@@ -731,14 +776,16 @@ function blurPass(src,dst,dx,dy,spread){gl.uniform2f(blur.u.uStep,dx/src.w*sprea
 function frame(now){
  frameId=0;
  if(!inView||document.hidden)return;
- if(preview&&now+2<nextDraw){
-  frameId=requestAnimationFrame(frame);
-  return;
- }
- if(preview)nextDraw=Math.max(nextDraw+1000/30,now);
+ // Full display rate in the preview too: physics snapshots are interpolated, so every frame is new motion.
  const dt=last?Math.min((now-last)/1000,.05):0;last=now;
  // Adaptive resolution: back off if the GPU cannot hold the display rate, never creep back above a failed level.
- if(dt>0){frameAvg+=(dt*1000-frameAvg)*.05;if(++frameCount%90===0){if(frameAvg>(preview?40:24)&&scale>1){scale=Math.max(1,scale*.85);scaleCap=scale;}else if(frameAvg<(preview?35:18.5)&&scale<scaleCap)scale=Math.min(scaleCap,scale*1.1);}}
+ if(dt>0){frameAvg+=(dt*1000-frameAvg)*.05;if(++frameCount%90===0){
+  const target=targetScale(),floor=Math.min(1,1/target);
+  if(frameAvg>24&&quality>floor){quality=Math.max(floor,quality*.85);qualityCap=quality;}
+  else if(frameAvg<18.5&&quality<qualityCap)quality=Math.min(qualityCap,quality*1.1);
+  scale=target*quality;
+ }}
+ else if(frameCount===0)scale=targetScale()*quality;
  const ease=1-Math.exp(-dt*10),slow=1-Math.exp(-dt*3);
  pointer.weight+=((pointer.active&&!drag?1:0)-pointer.weight)*ease;
  pointer.sx+=(pointer.x-pointer.sx)*ease;pointer.sy+=(pointer.y-pointer.sy)*ease;
@@ -771,7 +818,7 @@ function frame(now){
 
  // ── Scene pass ──
  const u=main.u;
- gl.bindFramebuffer(gl.FRAMEBUFFER,sceneT.fbo);gl.viewport(0,0,w,h);
+ gl.bindFramebuffer(gl.FRAMEBUFFER,msaa?msaa.fbo:sceneT.fbo);gl.viewport(0,0,w,h);
  gl.depthMask(true);gl.clearColor(S.bg[0],S.bg[1],S.bg[2],0);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
  // Flat background; alpha 0 means infinitely far for the focus pass.
  gl.useProgram(main);gl.enable(gl.DEPTH_TEST);gl.disable(gl.BLEND);
@@ -782,21 +829,35 @@ function frame(now){
  gl.uniform1f(u.uEncodeDepth,dof?1:0);gl.uniform1f(u.uPaletteHue,S.gradientHue);
  gl.uniform1f(u.uLightAmt,lightAmt);gl.uniform1f(u.uLightRadius,.45+S.cursorRadius*.9);gl.uniform3f(u.uLightPos,pointer.sx,pointer.sy,.75);
  for(let i=0;i<6;i++)gl.uniform3fv(u['uColor'+i],S.colors[i]);
- // Spheres
- gl.frontFace(gl.CW);gl.uniform1f(u.uLiquid,0);
- gl.bindBuffer(gl.ARRAY_BUFFER,sphereBuffer);gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,3,gl.FLOAT,false,0,0);gl.disableVertexAttribArray(1);gl.vertexAttrib3f(1,0,0,1);
- gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,indexBuffer);
- for(const {b} of ordered){
-  const c=b.contacts;let pressure=0,active=0;
-  for(let i=0;i<8;i++){const a=c[i*4+3];pressure+=a;if(a>.0001)active=i+1;}
-  gl.uniform3fv(u.uCenter,b.p);gl.uniform4fv(u['uContacts[0]'],c);gl.uniform1f(u.uRadius,b.r);gl.uniform1f(u.uPressure,pressure);gl.uniform1f(u.uActive,active);
-  gl.drawElements(gl.TRIANGLES,indices.length,gl.UNSIGNED_SHORT,0);
+ const liquidShown=liquid&&(!S.cutaway||(-sy1*fusion.group.center[0]+cy1*fusion.group.center[2])*cp1+fusion.group.center[1]*sp1<=0);
+ function drawBodies(){
+  // Spheres
+  gl.frontFace(gl.CW);gl.uniform1f(u.uLiquid,0);
+  gl.bindBuffer(gl.ARRAY_BUFFER,sphereBuffer);gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,3,gl.FLOAT,false,0,0);gl.disableVertexAttribArray(1);gl.vertexAttrib3f(1,0,0,1);
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,indexBuffer);
+  for(const {b} of ordered){
+   const c=b.contacts;let pressure=0,active=0;
+   for(let i=0;i<8;i++){const a=c[i*4+3];pressure+=a;if(a>.0001)active=i+1;}
+   gl.uniform3fv(u.uCenter,b.p);gl.uniform4fv(u['uContacts[0]'],c);gl.uniform1f(u.uRadius,b.r);gl.uniform1f(u.uPressure,pressure);gl.uniform1f(u.uActive,active);
+   gl.drawElements(gl.TRIANGLES,indices.length,gl.UNSIGNED_SHORT,0);
+  }
+  // Merged liquid bead
+  if(liquidShown){
+   gl.uniform1f(u.uLiquid,1);gl.frontFace(gl.CCW);gl.bindBuffer(gl.ARRAY_BUFFER,liquidBuffer);
+   gl.vertexAttribPointer(0,3,gl.FLOAT,false,24,0);gl.enableVertexAttribArray(1);gl.vertexAttribPointer(1,3,gl.FLOAT,false,24,12);
+   gl.drawArrays(gl.TRIANGLES,0,liquidVertices.length/6);
+  }
  }
- // Merged liquid bead
- if(liquid&&(!S.cutaway||(-sy1*fusion.group.center[0]+cy1*fusion.group.center[2])*cp1+fusion.group.center[1]*sp1<=0)){
-  gl.uniform1f(u.uLiquid,1);gl.frontFace(gl.CCW);gl.bindBuffer(gl.ARRAY_BUFFER,liquidBuffer);
-  gl.vertexAttribPointer(0,3,gl.FLOAT,false,24,0);gl.enableVertexAttribArray(1);gl.vertexAttribPointer(1,3,gl.FLOAT,false,24,12);
-  gl.drawArrays(gl.TRIANGLES,0,liquidVertices.length/6);
+ drawBodies();
+ if(msaa){
+  // Coverage of all beads (no depth test needed: it is a union), resolved to an antialiased alpha mask.
+  if(msaaCov){
+   gl.disable(gl.DEPTH_TEST);gl.bindFramebuffer(gl.FRAMEBUFFER,msaaCov.fbo);gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);
+   gl.uniform1f(u.uMaterial,4);drawBodies();
+   gl.bindFramebuffer(gl.READ_FRAMEBUFFER,msaaCov.fbo);gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER,covT.fbo);gl.blitFramebuffer(0,0,w,h,0,0,w,h,gl.COLOR_BUFFER_BIT,gl.NEAREST);
+  }
+  gl.bindFramebuffer(gl.READ_FRAMEBUFFER,msaa.fbo);gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER,sceneT.fbo);gl.blitFramebuffer(0,0,w,h,0,0,w,h,gl.COLOR_BUFFER_BIT,gl.NEAREST);
+  gl.bindFramebuffer(gl.READ_FRAMEBUFFER,null);gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER,null);
  }
  gl.disable(gl.BLEND);gl.disable(gl.DEPTH_TEST);gl.disable(gl.CULL_FACE);gl.depthMask(true);
 
@@ -828,11 +889,14 @@ function frame(now){
  gl.uniform1i(comp.u.uScene,0);gl.uniform1i(comp.u.uSoft,1);gl.uniform1i(comp.u.uSoftQ,5);gl.uniform1i(comp.u.uB0,2);gl.uniform1i(comp.u.uB1,3);gl.uniform1i(comp.u.uB2,4);gl.uniform1f(comp.u.uDof,dof?1:0);gl.uniform1f(comp.u.uAmount,S.blur*scale);
  const l0=glow>0?A[0]:sceneT,l1=glow>0?B[1]:sceneT,l2=glow>0?B[2]:sceneT;
  gl.activeTexture(gl.TEXTURE1);gl.bindTexture(gl.TEXTURE_2D,(dof?hA:sceneT).tex);gl.activeTexture(gl.TEXTURE5);gl.bindTexture(gl.TEXTURE_2D,(dof?dofA:sceneT).tex);gl.activeTexture(gl.TEXTURE2);gl.bindTexture(gl.TEXTURE_2D,l0.tex);gl.activeTexture(gl.TEXTURE3);gl.bindTexture(gl.TEXTURE_2D,l1.tex);gl.activeTexture(gl.TEXTURE4);gl.bindTexture(gl.TEXTURE_2D,l2.tex);
+ gl.activeTexture(gl.TEXTURE6);gl.bindTexture(gl.TEXTURE_2D,(msaaCov?covT:sceneT).tex);
+ gl.uniform1i(comp.u.uCov,6);gl.uniform1f(comp.u.uCovOn,msaaCov?1:0);gl.uniform3f(comp.u.uBg,S.bg[0],S.bg[1],S.bg[2]);
  gl.uniform1f(comp.u.uGlow,glow);
  fullscreen(null,sceneT,w,h);
  gl.activeTexture(gl.TEXTURE0);
 
- canvas.dataset.rendered=String(ordered.length);canvas.dataset.time=world.time.toFixed(2);canvas.dataset.scale=scale.toFixed(2);
+ canvas.dataset.rendered=String(ordered.length);canvas.dataset.time=world.time.toFixed(2);canvas.dataset.scale=scale.toFixed(2);canvas.dataset.msaa=String(msaa?samples:0);
+ if(ordered.length&&!canvas.classList.contains('ready'))canvas.classList.add('ready');
  frameId=requestAnimationFrame(frame);
 }
 // ───────── Settings tabs ─────────
