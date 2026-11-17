@@ -632,7 +632,7 @@ document.querySelectorAll('[data-next-case]').forEach(link=>link.addEventListene
    const r=area.getBoundingClientRect(),center=innerHeight*.5;
    if(r.bottom<innerHeight*.35||r.top>innerHeight*.65){item.entered=false;continue}
    if(!item.entered&&r.top<=center&&r.bottom>=center&&r.width&&r.height){
-    item.entered=true;video.muted=true;video.currentTime=0;video.play().catch(()=>{});
+    item.entered=true;video.muted=true;video.currentTime=0;video.play().catch(()=>{item.entered=false});
    }
   }
  }
@@ -662,8 +662,8 @@ document.querySelectorAll('.case-study__nav').forEach(nav=>{
  const videos=[...document.querySelectorAll('video:not(.case__video-fade)')];
  const near=new Set(),reduced=matchMedia('(prefers-reduced-motion:reduce)');
  const eligible=video=>{const panel=video.closest('.case-study');return (!panel||!panel.hidden)&&!(video.closest('main')&&document.body.classList.contains('case-study-open'))&&(!video.classList.contains('case-motion__video')||video.classList.contains('is-active'))};
- const resume=video=>{if(!video.loop||!eligible(video)||!near.has(video)||document.hidden||reduced.matches)return;video.muted=true;video.playsInline=true;if(video.paused)video.play().catch(()=>{})};
- const observer=new IntersectionObserver(entries=>entries.forEach(({target,isIntersecting})=>{if(isIntersecting){near.add(target);if(target.preload!=='auto'){target.preload='auto';if(target.networkState===HTMLMediaElement.NETWORK_EMPTY)target.load()}resume(target)}else{near.delete(target);if(target.loop)target.pause()}}),{rootMargin:'1200px'});
+ const resume=video=>{if(!eligible(video)||!near.has(video)||document.hidden||reduced.matches)return;if(!video.loop){const rect=video.getBoundingClientRect();if(!video.classList.contains('case__video')||video.ended||video.currentTime>0||rect.bottom<=0||rect.top>=innerHeight)return;}video.muted=true;video.playsInline=true;if(video.paused)video.play().catch(()=>{})};
+ const observer=new IntersectionObserver(entries=>entries.forEach(({target,isIntersecting})=>{if(isIntersecting){near.add(target);if(target.preload!=='auto'){target.preload='auto';if(target.readyState===HTMLMediaElement.HAVE_NOTHING)target.load()}resume(target)}else{near.delete(target);if(target.loop)target.pause()}}),{rootMargin:'1200px'});
  videos.forEach(video=>{video.muted=true;video.playsInline=true;observer.observe(video);video.addEventListener('canplay',()=>resume(video));video.addEventListener('loadeddata',()=>resume(video));new MutationObserver(()=>resume(video)).observe(video,{attributes:true,attributeFilter:['class']})});
  const refresh=()=>videos.forEach(resume);
  document.addEventListener('visibilitychange',()=>{if(document.hidden)videos.filter(v=>v.loop).forEach(v=>v.pause());else refresh()});
