@@ -2575,5 +2575,5 @@ a:focus-visible,button:focus-visible{text-decoration:underline;text-underline-of
     pointer-events:none;
   }
   #work>.case--interactive .case__details--edge { z-index:5 }
-  #work>.case--interactive .case__webgl { transform:none }
+  #work>.case--interactive .case__webgl { transform:scale(1.12) }
 }
