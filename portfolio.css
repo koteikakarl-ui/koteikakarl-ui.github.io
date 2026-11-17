@@ -2642,4 +2642,4 @@ a:focus-visible,button:focus-visible{text-decoration:underline;text-underline-of
   #work.cases>.case--interactive::before { scale:-1 1 }
 }
 
-#work>.case--interactive .case__details:disabled { cursor:default }
+#work>.case--interactive .case__status { padding:8px 14px; min-height:0; border-radius:999px; background:rgb(255 255 255 / 85%); color:#8c3a20; font-size:14px; cursor:default }
