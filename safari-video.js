@@ -12,7 +12,7 @@
  };
  const frames=new WeakMap();
  window.portfolioVideoFrame=video=>frames.get(video)?.draw();
- document.querySelectorAll('video').forEach(video=>{
+ const initialize=video=>{
   if(video.classList.contains('case__video-fade'))return;
   const original=video.querySelector('source')?.getAttribute('src');
   const source=sources[original?.split('/').pop()];if(!source)return;
@@ -55,6 +55,11 @@
   ['loadeddata','seeked','pause','ended'].forEach(event=>video.addEventListener(event,draw));
   new ResizeObserver(layout).observe(video);new MutationObserver(layout).observe(video,{attributes:true,attributeFilter:['class']});
   addEventListener('resize',layout,{passive:true});
-  video.src=source;video.muted=true;video.playsInline=true;video.load();
- });
+  video.src=source;video.muted=true;video.playsInline=true;video.preload='auto';video.load();
+ };
+ const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{
+  if(!entry.isIntersecting)return;
+  observer.unobserve(entry.target);initialize(entry.target);
+ }),{rootMargin:'1200px'});
+ document.querySelectorAll('video:not(.case__video-fade)').forEach(video=>observer.observe(video));
 })();
