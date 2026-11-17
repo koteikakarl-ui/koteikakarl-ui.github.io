@@ -182,6 +182,10 @@ if(creditCase&&creditCaseTrigger){
  const openCreditCase=(updateRoute=true)=>{
   if(updateRoute)routeToCase(creditCase.id);
   clearTimeout(closeTimer);caseIsOpen=true;creditCase.hidden=false;
+  creditCase.querySelectorAll("img").forEach(image=>{
+   const rect=image.getBoundingClientRect();
+   if(rect.width&&rect.height&&rect.top<innerHeight+1200){image.loading="eager";image.decode().catch(()=>{})}
+  });
   document.querySelector('main').inert=true;
   document.body.classList.add('case-study-open');creditCaseTrigger.setAttribute('aria-expanded','true');
   creditCaseScroll.scrollTop=0;heroPlaying=false;heroReplayReady=true;
@@ -664,7 +668,14 @@ document.querySelectorAll('.case-study__nav').forEach(nav=>{
  const refresh=()=>videos.forEach(resume);
  document.addEventListener('visibilitychange',()=>{if(document.hidden)videos.filter(v=>v.loop).forEach(v=>v.pause());else refresh()});
  addEventListener('pageshow',refresh);document.addEventListener('pointerup',refresh,{passive:true});reduced.addEventListener('change',()=>{if(reduced.matches)videos.filter(v=>v.loop).forEach(v=>v.pause());else refresh()});
- document.querySelectorAll('[data-before-after],[data-process-slider],.case-gallery').forEach(group=>{const loader=new IntersectionObserver(entries=>{if(entries.some(e=>e.isIntersecting)){group.querySelectorAll('img').forEach(image=>image.loading='eager');loader.disconnect()}},{rootMargin:'500px'});loader.observe(group)});
+ const images=new IntersectionObserver(entries=>entries.forEach(entry=>{
+  if(!entry.isIntersecting)return;
+  const image=entry.target;
+  image.loading='eager';
+  image.decode().catch(()=>{});
+  images.unobserve(image);
+ }),{rootMargin:'1200px'});
+ document.querySelectorAll('.case-study img').forEach(image=>images.observe(image));
 })();
 
 // Retry transient media failures once, including when a connection comes back.
