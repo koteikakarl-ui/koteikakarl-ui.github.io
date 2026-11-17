@@ -2588,5 +2588,13 @@ a:focus-visible,button:focus-visible{text-decoration:underline;text-underline-of
 }
 
 @media(max-width:700px) {
-  #work>.case--interactive .case__media { width:calc(100% + var(--gutter)); margin-inline:calc(-.5 * var(--gutter)) }
+  #work>.case--interactive .case__media {
+    width:calc(100% + var(--gutter));
+    margin:10px calc(-.5 * var(--gutter)) 0;
+    mask-image:linear-gradient(to bottom, #000 0%, #000 45%, transparent 100%);
+  }
+  #work>.case--interactive .case__webgl {
+    transform-origin:center top;
+    transform:scale(2);
+  }
 }

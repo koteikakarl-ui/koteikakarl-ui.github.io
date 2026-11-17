@@ -612,7 +612,7 @@ let physicsWorker,generation=0,previousSnapshot=null,currentSnapshot=null,receiv
 let currentAttractor={point:[0,0,0],axis:[0,0,1],strength:0,radius:DEFAULTS.cursorRadius,penetration:DEFAULTS.penetration};
 function sendPhysicsInput(force=false){
  const now=performance.now();if(!physicsWorker||(!force&&now-inputStamp<1000/60))return;inputStamp=now;
- physicsWorker.postMessage({type:'input',generation,config:Object.assign({},S.config,{paused:paused||document.hidden||!inView,fusion:S.fusion,maxRadius:preview ? .23 : undefined}),cursor:currentAttractor});
+ physicsWorker.postMessage({type:'input',generation,config:Object.assign({},S.config,{paused:paused||document.hidden||!inView,fusion:S.fusion,maxRadius:preview ? .46 : undefined}),cursor:currentAttractor});
 }
 function receivePhysics({data:s}){
  if(s.generation!==generation){physicsWorker.postMessage({type:'ack',buffer:s.data.buffer},[s.data.buffer]);return;}
