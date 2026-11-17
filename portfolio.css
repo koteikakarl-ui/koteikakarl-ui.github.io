@@ -263,7 +263,12 @@ body.has-left-hero .hero__mesh-canvas,body.has-left-hero .hero__mesh-blur,body.h
 .case:nth-of-type(3):before{background:radial-gradient(ellipse 90% 152% at 12.05% 45.86%,#fff 0%,#fff 9.5177%,#b6f1de 42.05%,#91e9cd 58.317%,#6ce2bd 74.583%,#51dcbb 80.937%,#36d6ba 87.292%,#1bcfb8 93.646%,#0eccb8 96.823%,#00c9b7 100%)}
 .case:nth-of-type(1) .case__copy,.case:nth-of-type(3) .case__copy{transform:none}
 .case:nth-of-type(2) .case__copy{transform:translateX(-25vw)}
-@media(max-width:900px){:root{--credit-case-gradient:linear-gradient(180deg,#fff 7%,#fff7c8 44%,#ffb26f 100%)}.case:nth-of-type(2) .case__copy{transform:none}.case:nth-of-type(1):before{background:var(--credit-case-gradient)}.case:nth-of-type(2):before{background:linear-gradient(180deg,#fff 7%,#fff6af 46%,#ffaa00 100%)}.case:nth-of-type(3):before{background:linear-gradient(180deg,#fff 7%,#effaf5 46%,#71d8c2 100%)}}
+@media(max-width:900px){:root{--credit-case-gradient:linear-gradient(180deg,#fff 7%,#fff7c8 44%,#ffb26f 100%)}.case:nth-of-type(2) .case__copy{transform:none}}
+@media(max-width:1100px){
+ .cases>.case:nth-of-type(1):before{background:linear-gradient(180deg,#fff 7%,#fff7c8 44%,#ffb26f 100%)}
+ .cases>.case:nth-of-type(2):before{background:linear-gradient(180deg,#fff 7%,#fff6af 46%,#ffaa00 100%)}
+ .cases>.case:nth-of-type(3):before{background:linear-gradient(180deg,#fff 7%,#effaf5 46%,#71d8c2 100%)}
+}
 
 @media(max-width:900px){.case:nth-child(2) .case__copy{transform:none}}
 @media(max-width:560px){.case__copy h2{font-size:clamp(26px,9vw,36px)}}
@@ -2543,10 +2548,6 @@ a:focus-visible,button:focus-visible{text-decoration:underline;text-underline-of
 @media(max-width:700px){.case-publication-links{flex-direction:column;align-items:flex-start;gap:14px}}
 
 /* JL Interactive uses the shared case layout and fade. */
-.cases>.case--interactive::before {
-  inset: 41% 2% 12%;
-  background: radial-gradient(ellipse at 78% 30%, #fff 0%, #fff6af 52%, #ffbf72 83%, #ff9a52 100%);
-}
 .case__webgl { display:block; width:100%; height:100%; border:0; pointer-events:none }
 #work>.case--interactive .case__media { mask-image:linear-gradient(to bottom, #000 0%, #000 68%, transparent 100%) }
 .case--interactive .case__details { text-decoration:none }
@@ -2583,9 +2584,6 @@ a:focus-visible,button:focus-visible{text-decoration:underline;text-underline-of
   #work>.case .case__details--edge { top:321px }
   #work>.case--interactive .case__details--edge { top:259px }
 }
-@media (max-width:1100px) {
-  #work>.case--interactive .case__meta { display:none }
-}
 
 @media(max-width:700px) {
   #work>.case--interactive .case__media {
@@ -2598,3 +2596,50 @@ a:focus-visible,button:focus-visible{text-decoration:underline;text-underline-of
     transform:scale(2);
   }
 }
+
+.scene-editor {
+  position:fixed; z-index:10000; right:12px; top:70px; width:min(260px, calc(100vw - 24px));
+  max-height:calc(100dvh - 82px); overflow:auto; padding:12px; border:1px solid #bdbdbd;
+  border-radius:10px; background:#fff; color:#222; box-shadow:0 4px 18px #0002; font:14px/1.3 system-ui;
+}
+.scene-editor summary { cursor:pointer; font-weight:650 }
+.scene-editor__controls,.scene-editor__fields { display:grid; gap:8px; margin-top:8px }
+.scene-editor__fields label { display:flex; align-items:center; justify-content:space-between; gap:8px }
+.scene-editor__fields input { width:72px; padding:3px }
+.scene-editor button { justify-self:start; cursor:pointer }
+
+#work>.case--editing-scene { overflow:visible }
+#work>.case--editing-scene .case__media {
+  overflow:visible;
+  mask-image:none;
+}
+
+@media(max-width:700px) {
+  #work>.case--editing-scene::after { content:none }
+}
+
+@media (701px <= width <= 1100px) {
+  #work>.case--editing-scene,
+  #work>.case--editing-scene .case__media {
+    clip-path:none;
+    contain:none;
+  }
+}
+
+@media(min-width:1101px) {
+  #work>.case--interactive { margin-top:20px }
+}
+
+#work.cases>.case--interactive::before {
+  bottom:20px;
+  background:linear-gradient(180deg, transparent 55%, #ffb7cb 100%), var(--credit-case-gradient);
+}
+@media(max-width:700px) {
+  #work.cases>.case--interactive::before { bottom:60px }
+}
+
+@media(min-width:1101px) {
+  #work.cases>.case--interactive::before { scale:-1 1 }
+}
+
+#work>.case--interactive .case__details:disabled { cursor:default }
