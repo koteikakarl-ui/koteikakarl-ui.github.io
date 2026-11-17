@@ -2551,9 +2551,11 @@ a:focus-visible,button:focus-visible{text-decoration:underline;text-underline-of
 #work>.case--interactive .case__media { mask-image:linear-gradient(to bottom, #000 0%, #000 68%, transparent 100%) }
 .case--interactive .case__details { text-decoration:none }
 @media(min-width:1101px) {
-  .case--interactive { height:440px }
+  .case--interactive { height:380px }
+  .case--interactive .case__copy h2 { display:none }
+  .case--interactive .case__details--edge { top:280px }
   #work>.case--interactive>.case__copy { transform:translateX(-25vw) }
-  .case--interactive .case__webgl { transform-origin:center top; transform:translate(-12%, -4%) scale(1.27) }
+  .case--interactive .case__webgl { transform-origin:center top; transform:translateX(-16%) scale(1.27) }
 }
 @media(max-width:1100px) {
   #work>.case--interactive .case__details--edge { order:1; margin-top:16px }
